@@ -24,6 +24,7 @@ public class IndieRPG extends JavaPlugin {
     private GuideManager guideManager;
     private JewelryManager jewelryManager;
     private ExchangeManager exchangeManager;
+    private SoulBeadManager soulBeadManager;
 
     @Override
     public void onEnable() {
@@ -45,6 +46,7 @@ public class IndieRPG extends JavaPlugin {
         guideManager = new GuideManager(this);
         jewelryManager = new JewelryManager(this);
         exchangeManager = new ExchangeManager(this);
+        soulBeadManager = new SoulBeadManager(this);
 
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -76,6 +78,7 @@ public class IndieRPG extends JavaPlugin {
         if (monsterCardManager != null) monsterCardManager.loadCards();
         if (guideManager != null) guideManager.loadEntries();
         if (jewelryManager != null) jewelryManager.loadSets();
+        if (soulBeadManager != null) soulBeadManager.loadBeads();
         getLogger().info("IndieRPG config reloaded!");
     }
 
@@ -95,4 +98,5 @@ public class IndieRPG extends JavaPlugin {
     public GuideManager getGuideManager() { return guideManager; }
     public JewelryManager getJewelryManager() { return jewelryManager; }
     public ExchangeManager getExchangeManager() { return exchangeManager; }
+    public SoulBeadManager getSoulBeadManager() { return soulBeadManager; }
 }

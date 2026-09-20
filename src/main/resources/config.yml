@@ -1,185 +1,120 @@
 # ============================================
-# IndieRPG Configuration - Fully Customizable
-# ============================================
-# All values below can be changed without touching code.
-# Restart or use /rpg reload to apply changes.
+# IndieRPG Configuration v4.0 - Full RPG Suite
 # ============================================
 
-# ---------- General Settings ----------
 general:
   prefix: "&d[IndieRPG] &r"
   debug: false
 
-# ---------- Space Ring (Virtual Storage) ----------
+# ---------- Space Ring ----------
 spacering:
   trigger-items:
     - "&aBasic Space Ring"
     - "&9Advanced Space Ring"
     - "&6Supreme Space Ring"
     - "&dLegendary Space Ring"
-  sizes:
-    - 9
-    - 27
-    - 54
-    - 54
+  sizes: [9, 27, 54, 54]
   save-contents: true
 
 # ---------- Soul Storage ----------
 soulstorage:
   enabled: true
-  trigger-items:
-    - "&5Soul Storage Orb"
-    - "&dSoul Pearl"
+  trigger-items: ["&5Soul Storage Orb", "&dSoul Pearl"]
   size: -1
   rows-per-page: 6
 
-# ---------- Talent System ----------
+# ---------- Talents ----------
 talent:
   enabled: true
   menu-title: "&d&lTalent System &7[Points: {points}]"
+  gui-size: 45
+  reset-slot: 40
+  reset-refund-percent: 80
+  effects:
+    attack-per-level: 0.5
+    defense-per-level: 0.5
+    health-per-level: 2
+    crit-per-level: 0.02
+    lifesteal-per-level: 0.01
   trees:
     attack:
       display-name: "&c&lAttack"
       icon: DIAMOND_SWORD
       max-level: 20
       points-per-level: 1
-      lore:
-        - "&7Each level: &c+4 Attack Damage"
-        - "&7Current: &f{level}/{max}"
+      lore: ["&7Each level: &c+0.5 Damage", "&7Current: &f{level}/{max}"]
       slot: 11
     defense:
       display-name: "&9&lDefense"
-      icon: DIAMOND_CHESTPLATE
+      icon: IRON_CHESTPLATE
       max-level: 20
       points-per-level: 1
-      lore:
-        - "&7Each level: &9+4 Armor"
-        - "&7Current: &f{level}/{max}"
+      lore: ["&7Each level: &9+0.5 Armor", "&7Current: &f{level}/{max}"]
       slot: 13
     health:
       display-name: "&a&lHealth"
       icon: APPLE
       max-level: 20
       points-per-level: 1
-      lore:
-        - "&7Each level: &a+10 Max Health"
-        - "&7Current: &f{level}/{max}"
+      lore: ["&7Each level: &a+2 HP", "&7Current: &f{level}/{max}"]
       slot: 15
     crit:
       display-name: "&e&lCrit"
       icon: GOLD_SWORD
       max-level: 10
       points-per-level: 2
-      lore:
-        - "&7Each level: &e+2% Crit Chance"
-        - "&7Current: &f{level}/{max}"
+      lore: ["&7Each level: &e+2% Crit", "&7Current: &f{level}/{max}"]
       slot: 29
     lifesteal:
       display-name: "&4&lLifesteal"
       icon: RED_ROSE
       max-level: 10
       points-per-level: 2
-      lore:
-        - "&7Each level: &4+1% Lifesteal"
-        - "&7Current: &f{level}/{max}"
+      lore: ["&7Each level: &4+1% Lifesteal", "&7Current: &f{level}/{max}"]
       slot: 31
-  gui-size: 45
-  reset-slot: 40
-  reset-refund-percent: 80
 
-# ---------- Task System ----------
+# ---------- Tasks ----------
 task:
   enabled: true
   required-kills: 15
-  rewards:
-    gold: 150
-    talent-points: 5
-    battlepass-xp: 50
-  start-message: "&a[Task] &7Slayer task started! Kill {count} monsters."
-  progress-message: "&a[Task] &7Progress: {kills}/{count}"
-  complete-message: "&6[Task] &eTask complete! +{gold} Gold, +{points} Talent Points"
+  rewards: {gold: 150, talent-points: 5, battlepass-xp: 50}
+  start-message: "&a[Task] &7Kill {count} monsters."
+  progress-message: "&a[Task] &7{kills}/{count}"
+  complete-message: "&6[Task] &eComplete! +{gold} Gold"
 
-# ---------- Crate System ----------
+# ---------- Crates ----------
 crate:
   enabled: true
   trigger-items:
-    common:
-      - "&7Common Crate"
-      - "&7普通宝箱"
-    rare:
-      - "&9Rare Crate"
-      - "&9稀有宝箱"
-    legendary:
-      - "&6Legendary Crate"
-      - "&6传说宝箱"
+    common: ["&7Common Crate"]
+    rare: ["&9Rare Crate"]
+    legendary: ["&6Legendary Crate"]
   rewards:
     common:
-      - chance: 0.60
-        gold: 10
-        talent-points: 0
-        battlepass-xp: 5
-      - chance: 0.30
-        gold: 50
-        talent-points: 0
-        battlepass-xp: 10
-      - chance: 0.10
-        gold: 100
-        talent-points: 1
-        battlepass-xp: 20
+      - {chance: 0.60, gold: 10, talent-points: 0, battlepass-xp: 5}
+      - {chance: 0.30, gold: 50, talent-points: 0, battlepass-xp: 10}
+      - {chance: 0.10, gold: 100, talent-points: 1, battlepass-xp: 20}
     rare:
-      - chance: 0.50
-        gold: 100
-        talent-points: 1
-        battlepass-xp: 20
-      - chance: 0.35
-        gold: 250
-        talent-points: 2
-        battlepass-xp: 40
-      - chance: 0.15
-        gold: 500
-        talent-points: 3
-        battlepass-xp: 80
+      - {chance: 0.50, gold: 100, talent-points: 1, battlepass-xp: 20}
+      - {chance: 0.35, gold: 250, talent-points: 2, battlepass-xp: 40}
+      - {chance: 0.15, gold: 500, talent-points: 3, battlepass-xp: 80}
     legendary:
-      - chance: 0.40
-        gold: 500
-        talent-points: 3
-        battlepass-xp: 80
-      - chance: 0.35
-        gold: 1000
-        talent-points: 5
-        battlepass-xp: 150
-      - chance: 0.25
-        gold: 2500
-        talent-points: 10
-        battlepass-xp: 300
+      - {chance: 0.40, gold: 500, talent-points: 3, battlepass-xp: 80}
+      - {chance: 0.35, gold: 1000, talent-points: 5, battlepass-xp: 150}
+      - {chance: 0.25, gold: 2500, talent-points: 10, battlepass-xp: 300}
 
-# ---------- Rank System ----------
+# ---------- Ranks ----------
 rank:
   enabled: true
   items:
-    "Warrior Title": "warrior"
-    "Knight Title": "knight"
-    "Legend Title": "legend"
-    "Mythic Title": "mythic"
+    "Warrior Title": warrior
+    "Knight Title": knight
+    "Legend Title": legend
   ranks:
-    default:
-      display: "&7&l[Rookie]"
-      chat-prefix: "&7[Rookie] "
-    warrior:
-      display: "&c&l[Warrior]"
-      chat-prefix: "&c[Warrior] "
-    knight:
-      display: "&f&l[Knight]"
-      chat-prefix: "&f[Knight] "
-    elite:
-      display: "&b&l[Elite]"
-      chat-prefix: "&b[Elite] "
-    legend:
-      display: "&6&l[Legend]"
-      chat-prefix: "&6[Legend] "
-    mythic:
-      display: "&5&l[Mythic]"
-      chat-prefix: "&5[Mythic] "
+    default: {display: "&7&l[Rookie]", chat-prefix: "&7[Rookie] "}
+    warrior: {display: "&c&l[Warrior]", chat-prefix: "&c[Warrior] "}
+    knight: {display: "&f&l[Knight]", chat-prefix: "&f[Knight] "}
+    legend: {display: "&6&l[Legend]", chat-prefix: "&6[Legend] "}
 
 # ---------- BattlePass ----------
 battlepass:
@@ -188,9 +123,7 @@ battlepass:
   max-level: 100
   kill-xp: 5
   milestone-every: 10
-  milestone-rewards:
-    talent-points: 5
-    gold: 500
+  milestone-rewards: {talent-points: 5, gold: 500}
   gold-per-level: 10
 
 # ---------- Economy ----------
@@ -198,69 +131,122 @@ economy:
   enabled: true
   starting-gold: 0
 
+# ---------- Daily Reward ----------
+daily:
+  enabled: true
+  rewards:
+    day1: {gold: 100, talent-points: 1}
+    day2: {gold: 200, talent-points: 1}
+    day3: {gold: 300, talent-points: 2}
+    day7: {gold: 1000, talent-points: 5}
+  message: "&e[Daily] &7Day {day}! +{gold} Gold"
+
+# ---------- Shop ----------
+shop:
+  enabled: true
+  menu-title: "&6&lGold Shop &7[Gold: {gold}]"
+  items:
+    talent-point: {price: 100, item: talent-point}
+    crate-common: {price: 50, item: crate-common}
+    crate-rare: {price: 200, item: crate-rare}
+    crate-legendary: {price: 1000, item: crate-legendary}
+    space-ring-basic: {price: 500, item: space-ring-basic}
+    space-ring-advanced: {price: 2000, item: space-ring-advanced}
+    soul-orb: {price: 10000, item: soul-orb}
+    battlepass-token: {price: 80, item: battlepass-token}
+
+# ---------- Storage (Soul Space Levels) ----------
+storage:
+  slots-per-page: 45
+  trigger-items: ["&5Soul Storage Orb", "&dSoul Pearl"]
+  levels:
+    1: {pages: 1, condition: NONE}
+    2: {pages: 3, condition: PERMISSION, value: indierpg.level.2}
+    3: {pages: 6, condition: XP_LEVEL, value: "10"}
+    4: {pages: 10, condition: ITEM, value: DIAMOND:1}
+
+# ---------- Monster Cards ----------
+cards:
+  enabled: true
+  definitions:
+    zombie: {effect: INCREASE_DAMAGE:0}
+    skeleton: {effect: SPEED:0}
+    spider: {effect: JUMP:0}
+  sets:
+    undead: {cards: [zombie, skeleton], effect: DAMAGE_RESISTANCE:0}
+
+# ---------- Bestiary Guide ----------
+guide:
+  enabled: true
+  unlock-on-kill: true
+  entries:
+    zombie:
+      mobs: [zombie]
+      required-kills: 10
+      unlock-chance: 25.0
+      reward: EMERALD:1
+      effect: INCREASE_DAMAGE:0
+    skeleton:
+      mobs: [skeleton]
+      required-kills: 5
+      unlock-chance: 50.0
+      reward: ARROW:16
+      effect: SPEED:0
+
+# ---------- Jewelry Slots ----------
+jewelry:
+  enabled: true
+  pages: 3
+  slots:
+    0: {permission: ""}
+    1: {permission: indierpg.jewelry.2}
+    2: {permission: indierpg.jewelry.3}
+  sets:
+    starter: {jewelry: [lucky-ring, speed-necklace], effect: SPEED:0}
+
+# ---------- Soul Beads (魂珠) ----------
+soul-beads:
+  enabled: true
+  page-size: 36
+  definitions:
+    zombie_core:
+      max: 3
+      permission: ""
+      effect: INCREASE_DAMAGE:0
+    skeleton_core:
+      max: 2
+      permission: ""
+      effect: SPEED:0
+    spider_core:
+      max: 2
+      permission: indierpg.bead.spider
+      effect: JUMP:1
+    ender_core:
+      max: 1
+      permission: indierpg.bead.ender
+      effect: SPEED:1
+  sets:
+    undead: {beads: [zombie_core, skeleton_core], effect: DAMAGE_RESISTANCE:0}
+    void: {beads: [ender_core], effect: NIGHT_VISION:0}
+
+# ---------- Item Exchange ----------
+exchange:
+  enabled: true
+  rules:
+    DIAMOND: {cost: 10, reward: EMERALD:1}
+    IRON_INGOT: {cost: 16, reward: GOLD_INGOT:1}
+
 # ---------- Custom Items ----------
 items:
-  space-ring-basic:
-    material: RING
-    display-name: "&aBasic Space Ring"
-    lore:
-      - "&7Right-click to open"
-      - "&79 slot virtual storage"
-  space-ring-advanced:
-    material: RING
-    display-name: "&9Advanced Space Ring"
-    lore:
-      - "&7Right-click to open"
-      - "&727 slot virtual storage"
-  space-ring-supreme:
-    material: RING
-    display-name: "&6Supreme Space Ring"
-    lore:
-      - "&7Right-click to open"
-      - "&754 slot virtual storage"
-  soul-orb:
-    material: ENDER_PEARL
-    display-name: "&5Soul Storage Orb"
-    lore:
-      - "&7Right-click to open"
-      - "&7Infinite soul storage"
-  crate-common:
-    material: CHEST
-    display-name: "&7Common Crate"
-    lore:
-      - "&7Right-click to open"
-  crate-rare:
-    material: CHEST
-    display-name: "&9Rare Crate"
-    lore:
-      - "&7Right-click to open"
-  crate-legendary:
-    material: CHEST
-    display-name: "&6Legendary Crate"
-    lore:
-      - "&7Right-click to open"
-  talent-point:
-    material: NETHER_STAR
-    display-name: "&bTalent Point"
-    lore:
-      - "&7Right-click to gain +1 talent point"
-  battlepass-token:
-    material: GOLD_RECORD
-    display-name: "&dBattle Pass Token"
-    lore:
-      - "&7Right-click to gain +10 battlepass XP"
-  title-warrior:
-    material: PAPER
-    display-name: "&cWarrior Title Scroll"
-    lore:
-      - "&7Right-click to obtain Warrior title"
-  title-knight:
-    material: PAPER
-    display-name: "&fKnight Title Scroll"
-    lore:
-      - "&7Right-click to obtain Knight title"
-  title-legend:
-    material: PAPER
-    display-name: "&6Legend Title Scroll"
-    lore:
-      - "&7Right-click to obtain Legend title"
+  space-ring-basic: {material: RING, display-name: "&aBasic Space Ring", lore: ["&7Right-click to open"]}
+  space-ring-advanced: {material: RING, display-name: "&9Advanced Space Ring", lore: ["&7Right-click to open"]}
+  space-ring-supreme: {material: RING, display-name: "&6Supreme Space Ring", lore: ["&7Right-click to open"]}
+  soul-orb: {material: ENDER_PEARL, display-name: "&5Soul Storage Orb", lore: ["&7Right-click to open"]}
+  crate-common: {material: CHEST, display-name: "&7Common Crate", lore: ["&7Right-click to open"]}
+  crate-rare: {material: CHEST, display-name: "&9Rare Crate", lore: ["&7Right-click to open"]}
+  crate-legendary: {material: CHEST, display-name: "&6Legendary Crate", lore: ["&7Right-click to open"]}
+  talent-point: {material: NETHER_STAR, display-name: "&bTalent Point", lore: ["&7Right-click for +1 point"]}
+  battlepass-token: {material: GOLD_RECORD, display-name: "&dBattle Pass Token", lore: ["&7Right-click for +10 XP"]}
+  title-warrior: {material: PAPER, display-name: "&cWarrior Title", lore: ["&7Right-click for title"]}
+  title-knight: {material: PAPER, display-name: "&fKnight Title", lore: ["&7Right-click for title"]}
+  title-legend: {material: PAPER, display-name: "&6Legend Title", lore: ["&7Right-click for title"]}
