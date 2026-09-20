@@ -1,0 +1,23 @@
+# IndieRPG Configuration
+# Independent RPG plugin compatible with MythicMobs
+
+# Space Ring settings
+spacering:
+  default-size: 27
+  max-size: 54
+
+# Talent settings
+talent:
+  max-level: 10
+  points-per-level: 1
+
+# Crate settings
+crate:
+  common-chance: 0.6
+  rare-chance: 0.3
+  epic-chance: 0.1
+
+# BattlePass settings
+battlepass:
+  xp-per-level: 100
+  max-level: 50
