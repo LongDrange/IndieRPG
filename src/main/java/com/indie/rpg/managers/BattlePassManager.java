@@ -8,38 +8,46 @@ import org.bukkit.entity.Player;
 public class BattlePassManager {
 
     private final IndieRPG plugin;
-    private static final int XP_PER_LEVEL = 100;
-    private static final int MAX_LEVEL = 50;
 
     public BattlePassManager(IndieRPG plugin) {
         this.plugin = plugin;
     }
 
     public void addXP(Player player, int amount) {
+        if (!plugin.getConfig().getBoolean("battlepass.enabled", true)) return;
+
+        int xpPerLevel = plugin.getConfig().getInt("battlepass.xp-per-level", 100);
+        int maxLevel = plugin.getConfig().getInt("battlepass.max-level", 50);
+        int milestoneEvery = plugin.getConfig().getInt("battlepass.milestone-every", 10);
+        int milestonePoints = plugin.getConfig().getInt("battlepass.milestone-rewards.talent-points", 5);
+        int milestoneGold = plugin.getConfig().getInt("battlepass.milestone-rewards.gold", 500);
+        int goldPerLevel = plugin.getConfig().getInt("battlepass.gold-per-level", 10);
+
         PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
         data.battlePassXP += amount;
 
-        while (data.battlePassXP >= XP_PER_LEVEL && data.battlePassLevel < MAX_LEVEL) {
-            data.battlePassXP -= XP_PER_LEVEL;
+        while (data.battlePassXP >= xpPerLevel && data.battlePassLevel < maxLevel) {
+            data.battlePassXP -= xpPerLevel;
             data.battlePassLevel++;
-            player.sendMessage(ChatColor.LIGHT_PURPLE + "[BattlePass] " + ChatColor.RESET + "Level up! Level " + data.battlePassLevel);
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
-            rewardLevel(player, data.battlePassLevel);
-        }
-    }
 
-    private void rewardLevel(Player player, int level) {
-        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
-        if (level % 10 == 0) {
-            data.talentPoints += 5;
-            player.sendMessage(ChatColor.GOLD + "[BattlePass] " + ChatColor.RESET + "Milestone reward: +5 Talent Points!");
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "[BattlePass] " + ChatColor.RESET +
+                    "Level up! Level " + data.battlePassLevel);
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+
+            data.gold += goldPerLevel * data.battlePassLevel;
+
+            if (data.battlePassLevel % milestoneEvery == 0) {
+                data.gold += milestoneGold;
+                plugin.getTalentManager().addTalentPoint(player, milestonePoints);
+                player.sendMessage(ChatColor.GOLD + "[BattlePass] Milestone! +" + milestoneGold + " Gold, +" + milestonePoints + " Talent Points");
+            }
         }
-        data.gold += level * 10;
     }
 
     public void showProgress(Player player) {
+        int xpPerLevel = plugin.getConfig().getInt("battlepass.xp-per-level", 100);
         PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
         player.sendMessage(ChatColor.LIGHT_PURPLE + "[BattlePass] " + ChatColor.RESET +
-                "Level: " + data.battlePassLevel + " | XP: " + data.battlePassXP + "/" + XP_PER_LEVEL);
+                "Level: " + data.battlePassLevel + " | XP: " + data.battlePassXP + "/" + xpPerLevel);
     }
 }

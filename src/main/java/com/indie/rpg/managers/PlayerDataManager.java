@@ -42,12 +42,16 @@ public class PlayerDataManager {
             data.talentPoints = config.getInt("talent-points", 0);
             data.battlePassLevel = config.getInt("battlepass-level", 0);
             data.battlePassXP = config.getInt("battlepass-xp", 0);
-            data.rank = config.getString("rank", "Rookie");
+            data.rank = config.getString("rank", "default");
             data.taskKills = config.getInt("task-kills", 0);
-            data.taskId = config.getString("task-id", "");
-            data.spaceRingSize = config.getInt("spacering-size", 27);
-            data.soulPearls = config.getInt("soul-pearls", 0);
-            data.gold = config.getInt("gold", 0);
+            data.taskActive = config.getBoolean("task-active", false);
+            data.gold = config.getInt("gold", plugin.getConfig().getInt("economy.starting-gold", 0));
+            data.talentLevels = new HashMap<>();
+            if (config.contains("talents")) {
+                for (String key : config.getConfigurationSection("talents").getKeys(false)) {
+                    data.talentLevels.put(key, config.getInt("talents." + key, 0));
+                }
+            }
         }
         return data;
     }
@@ -62,10 +66,13 @@ public class PlayerDataManager {
         config.set("battlepass-xp", data.battlePassXP);
         config.set("rank", data.rank);
         config.set("task-kills", data.taskKills);
-        config.set("task-id", data.taskId);
-        config.set("spacering-size", data.spaceRingSize);
-        config.set("soul-pearls", data.soulPearls);
+        config.set("task-active", data.taskActive);
         config.set("gold", data.gold);
+        if (data.talentLevels != null) {
+            for (Map.Entry<String, Integer> entry : data.talentLevels.entrySet()) {
+                config.set("talents." + entry.getKey(), entry.getValue());
+            }
+        }
         try {
             config.save(file);
         } catch (IOException e) {
@@ -86,13 +93,13 @@ public class PlayerDataManager {
         public int battlePassXP;
         public String rank;
         public int taskKills;
-        public String taskId;
-        public int spaceRingSize;
-        public int soulPearls;
+        public boolean taskActive;
         public int gold;
+        public Map<String, Integer> talentLevels;
 
         public PlayerData(UUID uuid) {
             this.uuid = uuid;
+            this.talentLevels = new HashMap<>();
         }
     }
 }

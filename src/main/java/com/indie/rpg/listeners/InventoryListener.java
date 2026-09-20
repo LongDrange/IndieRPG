@@ -19,11 +19,8 @@ public class InventoryListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         String title = event.getInventory().getTitle();
-        if (title.contains("Space Ring") || title.contains("Talent") || title.contains("Soul Storage")) {
-            if (event.getWhoClicked() instanceof Player) {
-                if (title.contains("Space Ring")) return;
-                event.setCancelled(true);
-            }
+        if (title.contains("Talent") || title.contains("Soul Storage")) {
+            event.setCancelled(true);
         }
     }
 
@@ -31,8 +28,9 @@ public class InventoryListener implements Listener {
     public void onEntityDeath(EntityDeathEvent event) {
         if (event.getEntity().getKiller() instanceof Player) {
             Player killer = event.getEntity().getKiller();
+            int killXp = plugin.getConfig().getInt("battlepass.kill-xp", 5);
             plugin.getTaskManager().onEntityKill(killer, event.getEntity());
-            plugin.getBattlePassManager().addXP(killer, 5);
+            plugin.getBattlePassManager().addXP(killer, killXp);
         }
     }
 

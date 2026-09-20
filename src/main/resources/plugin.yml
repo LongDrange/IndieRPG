@@ -1,33 +1,25 @@
 name: IndieRPG
-version: 1.0.0
+version: 2.0.0
 main: com.indie.rpg.IndieRPG
 api-version: 1.12
 author: Indie
-description: Independent RPG systems - space ring, talents, tasks, crates, rank, battlepass
+description: Fully config-driven RPG plugin - space ring, talents, tasks, crates, ranks, battlepass. Compatible with MythicMobs but not dependent.
 depend: []
 softdepend: [MythicMobs, PlaceholderAPI]
 commands:
   indierpg:
     description: Main command
     aliases: [irpg, rpg]
-    usage: |
-      /rpg give <item> [amount] - Give custom item
-      /rpg reload - Reload config
-      /rpg info - Show plugin info
   spacering:
-    description: Space ring commands
+    description: Open space ring
     aliases: [sr]
-    usage: /sr open
   talent:
-    description: Talent commands
+    description: Open talent menu
     aliases: [talents]
-    usage: /talent open
   task:
-    description: Task commands
-    usage: /task
+    description: Start task
   crate:
-    description: Crate commands
-    usage: /crate
+    description: Open crate
 permissions:
   indierpg.admin:
     description: Admin permission

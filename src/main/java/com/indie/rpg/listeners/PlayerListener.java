@@ -11,6 +11,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PlayerListener implements Listener {
 
     private final IndieRPG plugin;
@@ -28,52 +31,88 @@ public class PlayerListener implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         ItemMeta meta = item.getItemMeta();
-        if (meta == null || !meta.hasDisplayName()) return;
+        if (meta == null) return;
 
-        String name = ChatColor.stripColor(meta.getDisplayName());
+        String displayName = meta.hasDisplayName() ? meta.getDisplayName() : "";
+        List<String> lores = meta.hasLore() ? meta.getLore() : new ArrayList<>();
 
-        if (name.contains("Space Ring") || name.contains("空间戒指")) {
+        // Space Ring (check name + lore)
+        if (plugin.getSpaceRingManager().matchesLore(lores) || matchesAny(displayName,
+                plugin.getConfig().getStringList("spacering.trigger-items"))) {
             event.setCancelled(true);
-            int size = 27;
-            if (name.contains("Basic")) size = 9;
-            else if (name.contains("Advanced")) size = 27;
-            else if (name.contains("Supreme")) size = 54;
-            plugin.getSpaceRingManager().openSpaceRing(player, size);
+            plugin.getSpaceRingManager().openSpaceRing(player, displayName);
+            return;
         }
 
-        if (name.contains("Soul Storage") || name.contains("灵魂空间")) {
+        // Soul Storage
+        if (plugin.getSoulStorageManager().matchesLore(lores) || matchesAny(displayName,
+                plugin.getConfig().getStringList("soulstorage.trigger-items"))) {
             event.setCancelled(true);
-            plugin.getSpaceRingManager().openSoulStorage(player);
+            plugin.getSoulStorageManager().openSoulStorage(player, 0);
+            return;
         }
 
-        if (name.contains("Crate") || name.contains("宝箱")) {
+        // Crates
+        String crateTier = plugin.getCrateManager().detectTier(displayName);
+        if (crateTier == null) {
+            crateTier = plugin.getCrateManager().detectTierFromLore(lores);
+        }
+        if (crateTier != null) {
             event.setCancelled(true);
-            String tier = "common";
-            if (name.contains("Rare")) tier = "rare";
-            else if (name.contains("Legendary")) tier = "legendary";
-            plugin.getCrateManager().openCrate(player, tier);
+            plugin.getCrateManager().openCrate(player, crateTier);
             item.setAmount(item.getAmount() - 1);
+            return;
         }
 
-        if (name.contains("Talent Point") || name.contains("天赋点")) {
+        // Talent Point
+        if (plugin.getTalentManager().matchesLore(lores) || displayName.toLowerCase().contains("talent point")) {
             event.setCancelled(true);
             plugin.getTalentManager().addTalentPoint(player, 1);
             item.setAmount(item.getAmount() - 1);
+            return;
         }
 
-        if (name.contains("BattlePass") || name.contains("战令")) {
+        // BattlePass Token
+        if (displayName.toLowerCase().contains("battlepass") ||
+                containsLore(lores, "battlepass") || containsLore(lores, "战令")) {
             event.setCancelled(true);
-            plugin.getBattlePassManager().addXP(player, 10);
+            int xp = 10;
+            plugin.getBattlePassManager().addXP(player, xp);
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "+" + xp + " BattlePass XP!");
             item.setAmount(item.getAmount() - 1);
+            return;
         }
 
-        if (name.contains("Title") || name.contains("称号")) {
-            event.setCancelled(true);
-            String rank = "Warrior";
-            if (name.contains("Knight")) rank = "Knight";
-            else if (name.contains("Legend")) rank = "Legend";
-            plugin.getRankManager().setRank(player, rank);
-            item.setAmount(item.getAmount() - 1);
+        // Rank / Title
+        String rankId = plugin.getRankManager().detectRankFromName(displayName);
+        if (rankId == null) {
+            rankId = plugin.getRankManager().detectRankFromLore(lores);
         }
+        if (rankId != null) {
+            event.setCancelled(true);
+            plugin.getRankManager().setRank(player, rankId);
+            item.setAmount(item.getAmount() - 1);
+            return;
+        }
+    }
+
+    private boolean matchesAny(String displayName, List<String> triggers) {
+        String strippedName = ChatColor.stripColor(displayName).toLowerCase();
+        for (String trigger : triggers) {
+            String strippedTrigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', trigger)).toLowerCase();
+            if (strippedName.contains(strippedTrigger)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsLore(List<String> lores, String keyword) {
+        for (String lore : lores) {
+            if (ChatColor.stripColor(lore).toLowerCase().contains(keyword.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

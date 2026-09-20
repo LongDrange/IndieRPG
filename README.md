@@ -1,46 +1,64 @@
-# IndieRPG
+# IndieRPG v2.0.0
 
-Independent RPG plugin for Minecraft 1.12.2 Paper, fully compatible with MythicMobs.
+Fully config-driven RPG plugin for Minecraft 1.12.2 Paper. **No MythicMobs dependency required** (soft-compatible).
 
-## Features
+## What's New in v2.0.0
 
-| System | Command | Description |
-|--------|---------|-------------|
-| Space Ring | `/sr` | Virtual storage inventory (9/27/54 slots) |
-| Talent | `/talent` | Talent point allocation GUI (Attack/Defense/Health) |
-| Task | `/task` | Kill-count tasks with rewards |
-| Crate | `/crate` | Loot crates with rarity tiers |
-| Rank | Right-click title | Title system with color prefixes |
-| BattlePass | Auto | XP-based progression with milestone rewards |
-| Soul Storage | Right-click item | Infinite storage space |
+- ✅ **100% config-driven** — all values in `config.yml`, no code changes needed
+- ✅ **Zero MythicMobs dependency** — works standalone, also detects MythicMobs items
+- ✅ **Lore keyword detection** — triggers on both display name AND lore lines (works with MythicMobs custom items)
+- ✅ **Infinite soul storage** — set `size: -1` for unlimited paginated storage
+- ✅ **5 talent trees** — Attack/Defense/Health/Crit/Lifesteal, all configurable
+- ✅ **3 crate tiers** — Common/Rare/Legendary, fully customizable drop rates
+- ✅ **6 ranks** — Rookie/Warrior/Knight/Elite/Legend/Mythic
+- ✅ **12 built-in custom items** — `/rpg give <id>` to obtain
+- ✅ **Extensible** — add new trees, tiers, ranks, items purely via config
 
 ## Commands
 
-- `/rpg` - Main menu
-- `/rpg info` - Plugin info
-- `/rpg reload` - Reload config
-- `/sr` - Open Space Ring
-- `/talent` - Open Talent Menu
-- `/task` - Start Slayer Task
-- `/crate` - Open Crate
+| Command | Description |
+|---------|-------------|
+| `/rpg` | Main menu |
+| `/rpg info` | Plugin info |
+| `/rpg reload` | Reload config |
+| `/rpg give <id>` | Give custom item |
+| `/rpg items` | List all item IDs |
+| `/rpg gold` | Check gold |
+| `/rpg rank` | Check rank |
+| `/rpg bp` | BattlePass progress |
+| `/sr` | Open Space Ring |
+| `/talent` | Open Talent Menu |
+| `/task` | Start Slayer Task |
+| `/crate` | Open Common Crate |
 
-## Build
+## Quick Start
 
-```bash
-mvn clean package
-```
+1. Place `IndieRPG-2.0.0.jar` in `plugins/`
+2. Start server
+3. `/rpg items` to see all obtainable items
+4. `/rpg give space-ring-advanced` to get a ring
+5. Right-click the ring to open virtual storage
 
-Output: `target/IndieRPG-1.0.0.jar`
+## Configuration
 
-## Installation
+All settings are in `plugins/IndieRPG/config.yml` — edit and `/rpg reload`.
 
-1. Download or build `IndieRPG-1.0.0.jar`
-2. Place in `plugins/` folder
-3. (Optional) Install MythicMobs 4.13.0
-4. Start server
+### Key customizable sections:
 
-## Requirements
+- **spacering.trigger-items** — add your own ring names
+- **spacering.sizes** — ring sizes per tier
+- **soulstorage.size** — `-1` for infinite, or any number
+- **talent.trees** — add/remove talent trees, set max level, slot, icon
+- **crate.rewards** — add tiers, set drop chances and rewards
+- **rank.ranks** — add custom ranks with colors
+- **battlepass** — XP per level, max level, milestone rewards
+- **items** — define your own custom items (material, name, lore)
 
-- Minecraft 1.12.2 Paper/Spigot
-- Java 8+
-- MythicMobs (soft dependency, optional)
+## MythicMobs Compatibility
+
+The plugin detects item triggers by matching:
+1. **Display name** (any color format)
+2. **Lore lines** — keywords in lore (works with MythicMobs YAML items)
+
+If you create a MythicMobs item with `lore:
+  - "&7Right-click: Open Space Ring"`, it will trigger automatically.
