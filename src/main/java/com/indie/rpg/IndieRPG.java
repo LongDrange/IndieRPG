@@ -18,6 +18,12 @@ public class IndieRPG extends JavaPlugin {
     private RankManager rankManager;
     private BattlePassManager battlePassManager;
     private ItemManager itemManager;
+    private DailyRewardManager dailyRewardManager;
+    private ShopManager shopManager;
+    private MonsterCardManager monsterCardManager;
+    private GuideManager guideManager;
+    private JewelryManager jewelryManager;
+    private ExchangeManager exchangeManager;
 
     @Override
     public void onEnable() {
@@ -33,6 +39,12 @@ public class IndieRPG extends JavaPlugin {
         rankManager = new RankManager(this);
         battlePassManager = new BattlePassManager(this);
         itemManager = new ItemManager(this);
+        dailyRewardManager = new DailyRewardManager(this);
+        shopManager = new ShopManager(this);
+        monsterCardManager = new MonsterCardManager(this);
+        guideManager = new GuideManager(this);
+        jewelryManager = new JewelryManager(this);
+        exchangeManager = new ExchangeManager(this);
 
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
@@ -43,7 +55,7 @@ public class IndieRPG extends JavaPlugin {
         getCommand("task").setExecutor(new CommandHandler(this));
         getCommand("crate").setExecutor(new CommandHandler(this));
 
-        getLogger().info("IndieRPG v2.0.0 enabled! (Config-driven, MythicMobs-independent)");
+        getLogger().info("IndieRPG v4.0.0 enabled! (Full RPG Suite)");
         getLogger().info("MythicMobs detected: " + (getServer().getPluginManager().getPlugin("MythicMobs") != null));
     }
 
@@ -60,6 +72,10 @@ public class IndieRPG extends JavaPlugin {
         if (crateManager != null) crateManager.loadRewards();
         if (rankManager != null) rankManager.loadRanks();
         if (itemManager != null) itemManager.loadItems();
+        if (shopManager != null) shopManager.loadShop();
+        if (monsterCardManager != null) monsterCardManager.loadCards();
+        if (guideManager != null) guideManager.loadEntries();
+        if (jewelryManager != null) jewelryManager.loadSets();
         getLogger().info("IndieRPG config reloaded!");
     }
 
@@ -73,4 +89,10 @@ public class IndieRPG extends JavaPlugin {
     public RankManager getRankManager() { return rankManager; }
     public BattlePassManager getBattlePassManager() { return battlePassManager; }
     public ItemManager getItemManager() { return itemManager; }
+    public DailyRewardManager getDailyRewardManager() { return dailyRewardManager; }
+    public ShopManager getShopManager() { return shopManager; }
+    public MonsterCardManager getMonsterCardManager() { return monsterCardManager; }
+    public GuideManager getGuideManager() { return guideManager; }
+    public JewelryManager getJewelryManager() { return jewelryManager; }
+    public ExchangeManager getExchangeManager() { return exchangeManager; }
 }

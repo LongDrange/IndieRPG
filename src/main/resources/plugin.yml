@@ -1,9 +1,9 @@
 name: IndieRPG
-version: 2.0.0
+version: 4.0.0
 main: com.indie.rpg.IndieRPG
 api-version: 1.12
 author: Indie
-description: Fully config-driven RPG plugin - space ring, talents, tasks, crates, ranks, battlepass. Compatible with MythicMobs but not dependent.
+description: Full RPG suite - space ring, soul storage (multi-page), talents with real effects, tasks, crates, ranks, battlepass, daily rewards, gold shop, monster cards, bestiary guide, jewelry slots, item exchange. Compatible with MythicMobs via lore ID detection.
 depend: []
 softdepend: [MythicMobs, PlaceholderAPI]
 commands:
