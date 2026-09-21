@@ -1,29 +1,28 @@
 name: IndieRPG
-version: 4.0.0
+version: 4.1.0
 main: com.indie.rpg.IndieRPG
 api-version: 1.12
 author: Indie
-description: Full RPG suite - space ring, soul storage (multi-page), talents with real effects, tasks, crates, ranks, battlepass, daily rewards, gold shop, monster cards, bestiary guide, jewelry slots, item exchange. Compatible with MythicMobs via lore ID detection.
-depend: []
+description: 中文 RPG 系統，支援獨立配置、Lore、飾品成長與 MythicMobs 4.13.0
 softdepend: [MythicMobs, PlaceholderAPI]
 commands:
   indierpg:
-    description: Main command
+    description: IndieRPG 中文主指令
     aliases: [irpg, rpg]
   spacering:
-    description: Open space ring
+    description: 開啟空間戒指
     aliases: [sr]
   talent:
-    description: Open talent menu
+    description: 開啟天賦介面
     aliases: [talents]
   task:
-    description: Start task
+    description: 開始任務
   crate:
-    description: Open crate
+    description: 開啟寶箱
 permissions:
   indierpg.admin:
-    description: Admin permission
+    description: IndieRPG 管理員權限
     default: op
   indierpg.user:
-    description: User permission
+    description: IndieRPG 玩家權限
     default: true
