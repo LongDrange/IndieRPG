@@ -31,6 +31,8 @@ public class IndieRPG extends JavaPlugin {
     private SoulBeadManager soulBeadManager;
     private JobManager jobManager;
     private AttributeEngine attributeEngine;
+    private PartyManager partyManager;
+    private GuildManager guildManager;
     private MythicMobsHook mythicMobsHook;
 
     @Override public void onEnable() {
@@ -58,14 +60,17 @@ public class IndieRPG extends JavaPlugin {
         soulBeadManager = new SoulBeadManager(this);
         jobManager = new JobManager(this);
         attributeEngine = new AttributeEngine(this);
+        partyManager = new PartyManager(this);
+        guildManager = new GuildManager(this);
         mythicMobsHook = new MythicMobsHook(this);
         mythicMobsHook.enable();
 
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.CombatListener(this), this);
+        getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.PartyListener(this), this);
         CommandHandler handler = new CommandHandler(this);
-        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job"})
+        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job", "party", "guild"})
             if (getCommand(command) != null) getCommand(command).setExecutor(handler);
         getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override public void run() {
@@ -119,5 +124,7 @@ public class IndieRPG extends JavaPlugin {
     public SoulBeadManager getSoulBeadManager() { return soulBeadManager; }
     public JobManager getJobManager() { return jobManager; }
     public AttributeEngine getAttributeEngine() { return attributeEngine; }
+    public PartyManager getPartyManager() { return partyManager; }
+    public GuildManager getGuildManager() { return guildManager; }
     public MythicMobsHook getMythicMobsHook() { return mythicMobsHook; }
 }

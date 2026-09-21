@@ -48,6 +48,10 @@ public class CommandHandler implements CommandExecutor {
                 return true;
             case "job":
                 return handleJob(player, args);
+            case "party":
+                return handleParty(player, args);
+            case "guild":
+                return handleGuild(player, args);
             default:
                 return false;
         }
@@ -81,6 +85,51 @@ public class CommandHandler implements CommandExecutor {
         plugin.getJobManager().setJob(player, sub);
         return true;
     }
+    private boolean handleParty(Player player, String[] args) {
+        if (args.length == 0) {
+            player.sendMessage("§e/party create|invite <player>|accept|leave");
+            return true;
+        }
+        String sub = args[0].toLowerCase();
+        if (sub.equals("create")) {
+            plugin.getPartyManager().create(player);
+        } else if (sub.equals("invite") && args.length >= 2) {
+            Player t = plugin.getServer().getPlayer(args[1]);
+            if (t != null) plugin.getPartyManager().invite(player, t);
+        } else if (sub.equals("accept")) {
+            plugin.getPartyManager().accept(player);
+        } else if (sub.equals("leave")) {
+            plugin.getPartyManager().leave(player);
+        }
+        return true;
+    }
+
+    private boolean handleGuild(Player player, String[] args) {
+        if (args.length == 0) {
+            player.sendMessage("§e/guild create <name>|invite <player>|accept|leave|info");
+            return true;
+        }
+        String sub = args[0].toLowerCase();
+        if (sub.equals("create") && args.length >= 2) {
+            plugin.getGuildManager().createGuild(player, args[1]);
+        } else if (sub.equals("invite") && args.length >= 2) {
+            Player t = plugin.getServer().getPlayer(args[1]);
+            if (t != null) plugin.getGuildManager().invite(player, t);
+        } else if (sub.equals("accept")) {
+            plugin.getGuildManager().accept(player);
+        } else if (sub.equals("leave")) {
+            plugin.getGuildManager().leave(player);
+        } else if (sub.equals("info")) {
+            com.indie.rpg.managers.GuildManager.Guild g = plugin.getGuildManager().getGuild(player);
+            if (g == null) {
+                player.sendMessage("§c你沒有公會。");
+            } else {
+                player.sendMessage("§6公會：" + g.getName() + " §7等級 " + g.getLevel() + " §7成員 " + g.getMembers().size());
+            }
+        }
+        return true;
+    }
+
     private boolean handleLDAPI(Player player, String[] args) {
         String prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("general.prefix", "&d[LDAPI] &r"));
 

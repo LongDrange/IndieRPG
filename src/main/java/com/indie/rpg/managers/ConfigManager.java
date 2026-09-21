@@ -25,7 +25,7 @@ public class ConfigManager {
 
     public void reloadAll() {
         files.clear();
-        String[] names = {"general", "items", "attributes", "jewelry", "spaces", "commands", "tests", "shop", "dailyreward", "mythicmobs", "jobs"};
+        String[] names = {"general", "items", "attributes", "jewelry", "spaces", "commands", "tests", "shop", "dailyreward", "mythicmobs", "jobs", "parties", "guilds"};
         for (String name : names) {
             File file = new File(directory, name + ".yml");
             if (!file.exists()) {

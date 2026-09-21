@@ -1,0 +1,21 @@
+creation-cost: 5000
+max-level: 20
+max-members-per-level: 10
+level-up-exp:
+  "1": 10000
+  "2": 25000
+  "3": 50000
+  "4": 100000
+  "5": 200000
+buffs:
+  "2":
+    attack: 1.0
+    defense: 1.0
+  "5":
+    attack: 3.0
+    defense: 3.0
+    health: 10.0
+  "10":
+    attack: 8.0
+    defense: 8.0
+    health: 30.0

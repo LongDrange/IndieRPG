@@ -55,6 +55,12 @@ public class PlayerDataManager {
         data.job = config.getString("job", "");
         data.jobLevel = config.getInt("job-level", 1);
         data.jobExp = config.getLong("job-exp", 0L);
+        
+        if (config.isConfigurationSection("reputation")) {
+            for (String k : config.getConfigurationSection("reputation").getKeys(false)) {
+                data.reputation.put(k, config.getInt("reputation." + k));
+            }
+        }
 
         if (config.isConfigurationSection("talents")) {
             for (String key : config.getConfigurationSection("talents").getKeys(false)) {
@@ -91,6 +97,10 @@ public class PlayerDataManager {
         config.set("job", data.job);
         config.set("job-level", data.jobLevel);
         config.set("job-exp", data.jobExp);
+        
+        for (Map.Entry<String, Integer> e : data.reputation.entrySet()) {
+            config.set("reputation." + e.getKey(), e.getValue());
+        }
 
         for (Map.Entry<String, Integer> e : data.talentLevels.entrySet()) {
             config.set("talents." + e.getKey(), e.getValue());
@@ -146,6 +156,9 @@ public class PlayerDataManager {
 
         // ---- 執行時快取（不持久化）----
         public transient Map<String, Double> computedAttributes = new HashMap<>();
+        
+        // ---- 擴充：聲望 ----
+        public Map<String, Integer> reputation = new HashMap<>();
 
         public PlayerData(UUID uuid) {
             this.uuid = uuid;

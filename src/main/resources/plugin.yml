@@ -24,6 +24,12 @@ commands:
   job:
     description: 職業系統
     aliases: [jobs, ldjob]
+  party:
+    description: 隊伍系統
+    aliases: [pt, ldparty]
+  guild:
+    description: 公會系統
+    aliases: [g, ldguild]
 permissions:
   ldapi.admin:
     description: LDAPI 管理員權限
