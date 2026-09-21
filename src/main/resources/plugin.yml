@@ -1,28 +1,30 @@
-name: IndieRPG
-version: 4.1.0
+name: LDAPI
+version: 1.0.0
 main: com.indie.rpg.IndieRPG
 api-version: 1.12
-author: Indie
-description: 中文 RPG 系統，支援獨立配置、Lore、飾品成長與 MythicMobs 4.13.0
+author: LongDrange
+description: LDAPI 中文 RPG API，支援獨立配置、Lore、飾品成長與 MythicMobs 4.13.0
 softdepend: [MythicMobs, PlaceholderAPI]
 commands:
-  indierpg:
-    description: IndieRPG 中文主指令
-    aliases: [irpg, rpg]
+  ldapi:
+    description: LDAPI 主指令
+    aliases: [ld, led]
   spacering:
     description: 開啟空間戒指
-    aliases: [sr]
+    aliases: [sr, ldsr]
   talent:
     description: 開啟天賦介面
-    aliases: [talents]
+    aliases: [talents, ldtalent]
   task:
     description: 開始任務
+    aliases: [ldtask]
   crate:
     description: 開啟寶箱
+    aliases: [ldcrate]
 permissions:
-  indierpg.admin:
-    description: IndieRPG 管理員權限
+  ldapi.admin:
+    description: LDAPI 管理員權限
     default: op
-  indierpg.user:
-    description: IndieRPG 玩家權限
+  ldapi.user:
+    description: LDAPI 玩家權限
     default: true

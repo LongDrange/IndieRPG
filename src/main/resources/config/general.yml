@@ -1,6 +1,7 @@
 general:
-  prefix: "&d[IndieRPG] &r"
+  prefix: "&d[LDAPI] &r"
   debug: false
+  command-prefix: ld
   lore:
     enabled: true
     ignore-color: true
