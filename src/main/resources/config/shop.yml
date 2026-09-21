@@ -1,19 +1,16 @@
 shop:
   enabled: true
-  menu-title: "&6&lLDAPI 商店"
+  menu-title: "&6&lLDAPI 商店 &7[金幣：{gold}]"
   items:
     growth_core:
       price: 80
       material: EMERALD
       display-name: "&b成長核心"
       item: growth_core
+      slot: 11
     abyss_ring:
       price: 300
       material: DIAMOND
       display-name: "&5深淵戒指"
       item: abyss_ring
-    talent_point:
-      price: 100
-      material: NETHER_STAR
-      display-name: "&b天賦點數"
-      item: talent_point
+      slot: 15

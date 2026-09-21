@@ -1,19 +1,9 @@
 dailyreward:
   enabled: true
-  gold: 100
-  xp: 25
   cooldown-hours: 24
-  message: "&e[每日獎勵] &7已領取：+{gold} 金幣，+{xp} 經驗。"
+  message: "&e[每日獎勵] &7第 {day} 天：+{gold} 金幣，+{xp} XP"
   rewards:
-    day1:
-      gold: 100
-      xp: 10
-    day2:
-      gold: 150
-      xp: 15
-    day3:
-      gold: 200
-      xp: 20
-    day7:
-      gold: 500
-      xp: 50
+    day1: {gold: 100, xp: 25, item: growth_core}
+    day2: {gold: 150, xp: 30, item: ""}
+    day3: {gold: 200, xp: 50, item: growth_core}
+    day7: {gold: 1000, xp: 200, item: abyss_ring}

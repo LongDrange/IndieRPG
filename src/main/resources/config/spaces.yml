@@ -1,6 +1,17 @@
 spaces:
-  main:
-    id: main
-    name: Main Space
-    display-name: "&a主空間"
-    size: 54
+  enabled: true
+  default-space: basic
+  definitions:
+    basic:
+      id: basic
+      display-name: "&a基礎空間"
+      size: 27
+      permission: ""
+    advanced:
+      id: advanced
+      display-name: "&9進階空間"
+      size: 54
+      permission: ldapi.space.advanced
+  trigger-items:
+    - "item-id: space_ring_basic"
+    - "item-id: space_ring_advanced"

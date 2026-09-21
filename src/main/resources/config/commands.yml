@@ -1,7 +1,8 @@
 commands:
-  root: rpg
-  reload: reload
-  jewelry: jewelry
-  attributes: attributes
-  space: space
-  test: test
+  main: ld
+  aliases: [ld]
+  messages:
+    no-permission: "&c你沒有權限。"
+    reload-success: "&aLDAPI 配置已重新載入。"
+    unknown-item: "&c找不到物品：{id}"
+    unknown-command: "&c未知指令，輸入 /ld 查看幫助。"

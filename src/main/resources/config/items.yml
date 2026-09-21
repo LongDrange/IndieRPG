@@ -1,10 +1,21 @@
 items:
+  # 自訂物品 ID 必須唯一，建議只使用小寫英文、數字與底線。
   growth_core:
     id: growth_core
-    namespace: indierpg:item
+    namespace: ldapi:item
     material: EMERALD
-    display-material: EMERALD
     display-name: "&b成長核心"
     lore:
       - "&7item-id: growth_core"
+      - "&7namespace: ldapi:item"
       - "&7用途：提升飾品成長"
+    amount: 1
+  abyss_ring:
+    id: abyss_ring
+    namespace: ldapi:jewelry
+    material: DIAMOND
+    display-name: "&5深淵戒指"
+    lore:
+      - "&7jewelry-id: abyss_ring"
+      - "&7namespace: ldapi:jewelry"
+    amount: 1

@@ -1,8 +1,4 @@
 tests:
-  required-files: [general.yml, items.yml, attributes.yml, jewelry.yml, spaces.yml, commands.yml]
-  lore-cases:
-    - {line: "indierpg-id: abyss_ring", expected: abyss_ring}
-    - {line: "mythic-id: Growth_Core", expected: growth_core}
-  growth:
-    unlimited-level: -1
-    verify-different-per-level: true
+  enabled: true
+  required-files: [general.yml, items.yml, attributes.yml, jewelry.yml, spaces.yml, commands.yml, shop.yml, dailyreward.yml, mythicmobs.yml]
+  verbose: false

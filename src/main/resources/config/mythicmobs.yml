@@ -1,8 +1,10 @@
 mythicmobs:
+  # false 會停用事件綁定，但不影響 LDAPI 其他功能。
   enabled: true
   api-version: "4.13.0"
   events:
     ldapi_boss:
+      # 必須對應 MythicMobs 怪物 internal name。
       spawn:
         skill: LDAPI_BOSS_SPAWN
       death:
@@ -18,4 +20,3 @@ mythicmobs:
         gold: 25
         battlepass-xp: 10
         item: growth_core
-  # mob ID 必須與 MythicMobs 的 internal name 一致；獎勵只在擊殺者存在時發放。
