@@ -1,0 +1,5 @@
+attributes:
+  attack: {display-name: "&c攻擊", default: 0, min: 0, max: 1000000}
+  defense: {display-name: "&9防禦", default: 0, min: 0, max: 1000000}
+  health: {display-name: "&a生命", default: 0, min: 0, max: 1000000}
+  crit: {display-name: "&e暴擊", default: 0, min: 0, max: 1000000}

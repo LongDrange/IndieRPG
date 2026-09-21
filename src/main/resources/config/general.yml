@@ -1,0 +1,7 @@
+general:
+  prefix: "&d[IndieRPG] &r"
+  debug: false
+  lore:
+    enabled: true
+    ignore-color: true
+    id-keys: [indierpg-id, item-id, mythic-id, namespace, jewelry-id, card-id, soul-bead-id]

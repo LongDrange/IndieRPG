@@ -1,0 +1,6 @@
+spaces:
+  main:
+    id: main
+    name: Main Space
+    display-name: "&a主空間"
+    size: 54

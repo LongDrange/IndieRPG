@@ -1,0 +1,7 @@
+commands:
+  root: rpg
+  reload: reload
+  jewelry: jewelry
+  attributes: attributes
+  space: space
+  test: test

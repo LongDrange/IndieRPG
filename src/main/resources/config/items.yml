@@ -1,0 +1,10 @@
+items:
+  growth_core:
+    id: growth_core
+    namespace: indierpg:item
+    material: EMERALD
+    display-material: EMERALD
+    display-name: "&b成長核心"
+    lore:
+      - "&7item-id: growth_core"
+      - "&7用途：提升飾品成長"

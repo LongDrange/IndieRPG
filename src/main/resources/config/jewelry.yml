@@ -1,0 +1,18 @@
+jewelry:
+  enabled: true
+  slots: 9
+  definitions:
+    abyss_ring:
+      id: abyss_ring
+      namespace: indierpg:jewelry
+      name: "&5深淵戒指"
+      material: DIAMOND
+      base-attributes: {attack: 10, defense: 5}
+      growth:
+        max-level: -1
+        sources: [online-time, real-time, special-item]
+        per-level:
+          "1": {attack: 1.0, defense: 0.5}
+          "2": {attack: 1.5, defense: 0.8}
+          "3": {attack: 2.5, defense: 1.2}
+        default-per-level: {attack: 1.0, defense: 0.5}
