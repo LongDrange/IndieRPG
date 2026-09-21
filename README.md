@@ -1,137 +1,187 @@
-# LDAPI
+# LDAPI (IndieRPG)
 
-> Minecraft 1.12.2 Paper 中文 RPG 核心｜Java 8｜MythicMobs 4.13.0 整合
+Paper 1.12.2 独立 RPG 核心插件，相容 MythicMobs 4.13.0。
 
-## 版本資訊
+## 功能总览
 
-- 版本：`1.0.0`
-- 核心：Paper 1.12.2
-- Java：8
-- 主指令：`/ld`
-- Bukkit 命令名稱：`ldapi`
-- `/LD`：Bukkit 命令不分大小寫，可用
-- `/led`：已移除，不再註冊
-- MythicMobs：可選軟依賴
-
-## 功能
-
-- 自訂物品與 Lore ID 識別
-- 飾品、屬性與無限成長
-- 空間戒指與魂靈儲存
-- 天賦、任務、寶箱、稱號
-- BattlePass、金幣、商店、每日獎勵
-- 玩家資料 YAML 持久化
-- MythicMobs 技能、生成、死亡事件與 RPG 獎勵整合
+- **自定義物品**：Lore ID 識別，支援 `indierpg-id`、`item-id` 等標籤
+- **屬性引擎**：基礎 / 職業 / 天賦 / 公會 / 裝備 / 寵物 六層疊加
+- **職業系統**：戰士、法師、刺客、牧師，每級自動加屬性，升級解鎖 MythicMobs 技能
+- **天賦系統**：GUI 加點，多棵天賦樹，即時反映到屬性
+- **戰鬥計算**：攻擊力加成、爆擊、防禦減傷
+- **隊伍系統**：邀請、接受、經驗共享（30 格內）
+- **公會系統**：建立、邀請、公會等級、公會 Buff、公會銀行
+- **副本系統**：世界模板複製、波次生成、通關獎勵
+- **寵物系統**：MythicMobs 召喚、跟隨、屬性加成
+- **聲望系統**：多陣營、階段變化
+- **NPC 對話**：文字對話、獎勵金幣與聲望
+- **裝備屬性**：Lore 中 `attribute-attack: 15.0` 自動生效
+- **GUI 框架**：可擴充的通用介面
+- **PlaceholderAPI**：支援 `%ldapi_gold%` 等變數
 
 ## 安裝
 
-1. 準備 Paper 1.12.2 與 Java 8。
-2. 若需要 MythicMobs 整合，安裝 MythicMobs 4.13.0。
-3. 在專案根目錄執行：
+### 前置需求
 
-   ```bash
-   mvn clean package
-   ```
+- **Paper 1.12.2**（或 Spigot 1.12.2）
+- **Java 8**
+- （可選）**MythicMobs 4.13.0**
+- （可選）**PlaceholderAPI**
 
-4. 將 `target/LDAPI-1.0.0.jar` 放入伺服器 `plugins/`。
-5. 啟動一次伺服器，確認 `plugins/LDAPI/` 已生成。
-6. 編輯 `plugins/LDAPI/config/` 內的 YAML。
-7. 重啟，或由有 `ldapi.admin` 權限的管理員執行 `/ld reload`。
-
-## 指令
-
-```text
-/ld                         顯示幫助
-/ld info                    顯示版本、核心與 MythicMobs 狀態
-/ld reload                  重載配置（ldapi.admin）
-/ld items                   列出物品 ID
-/ld give <item-id>          給予物品
-/ld gold                    查看金幣
-/ld rank                    查看稱號
-/ld bp                      查看戰令
-/ld admin reload            管理員重載
-/ld admin setlevel <玩家> <飾品ID> <等級>
-/ld admin addgrowth <玩家> <飾品ID> <數值>
-/ld admin resetdata <玩家>
-
-/sr、/ldsr                 空間戒指
-/talent、/ldtalent         天賦
-/task、/ldtask             任務
-/crate、/ldcrate           寶箱
-```
-
-## 配置檔案
-
-```text
-plugins/LDAPI/
-├─ config.yml                         主配置與舊版相容設定
-├─ config/
-│  ├─ general.yml                     前綴、Lore ID
-│  ├─ items.yml                       自訂物品
-│  ├─ attributes.yml                  屬性
-│  ├─ jewelry.yml                     飾品與成長
-│  ├─ spaces.yml                      空間戒指
-│  ├─ commands.yml                    指令文案
-│  ├─ tests.yml                       測試開關
-│  ├─ shop.yml                        金幣商店
-│  ├─ dailyreward.yml                 每日獎勵
-│  └─ mythicmobs.yml                  MythicMobs 綁定
-├─ playerdata/<UUID>.yml              玩家資料
-└─ logs/                              插件記錄
-```
-
-> YAML 嚴格使用空格縮排，禁止 Tab。修改前請備份整個 `plugins/LDAPI/`。
-
-## MythicMobs 快速範例
-
-`config/mythicmobs.yml`：
-
-```yaml
-mythicmobs:
-  enabled: true
-  events:
-    ldapi_boss:
-      death:
-        chance: 1.0
-        gold: 500
-        battlepass-xp: 50
-        item: growth_core
-        skill: LDAPI_BOSS_DEATH
-```
-
-其中 `ldapi_boss` 必須與 MythicMobs 怪物的 internal name 一致，`growth_core` 必須存在於 `items.yml`。詳見 [`docs/MythicMobs整合教學.md`](docs/MythicMobs整合教學.md)。
-
-## 測試流程
-
-```text
-/ld info
-/ld items
-/ld give growth_core
-/ld gold
-/ld bp
-```
-
-完成配置後，測試普通怪物、MythicMobs 怪物、玩家退出登入及伺服器重啟，確認資料仍存在。
-
-## 排錯
-
-- `/ld` 不存在：確認插件成功載入、`plugin.yml` 有 `ldapi` 與 alias `ld`。
-- 配置無效：檢查 YAML 縮排，再執行 `/ld reload`。
-- 物品無法識別：確認 Lore 使用 `item-id: xxx`，且 key 在 `general.yml`。
-- MythicMobs 未觸發：確認插件名稱、internal name、技能名稱與控制台 API 訊息。
-- 玩家資料異常：停止伺服器後備份並檢查 `playerdata/<UUID>.yml`，不要在線刪除。
-
-## 文件
-
-- [完整使用教學](docs/完整使用教學.md)
-- [詳細配置說明](docs/詳細配置範例.md)
-- [MythicMobs 整合教學](docs/MythicMobs整合教學.md)
-- [Release Notes](docs/RELEASE_NOTES_1.0.0.md)
-
-## 建置
+### 編譯
 
 ```bash
+git clone https://github.com/LongDrange/IndieRPG.git
+cd IndieRPG
 mvn clean package
 ```
 
-輸出：`target/LDAPI-1.0.0.jar`
+產出：
+
+```
+target/LDAPI-1.0.0.jar
+target/LDAPI-1.0.0-javadoc.jar
+target/LDAPI-1.0.0-sources.jar
+```
+
+### 部署
+
+1. 把 `LDAPI-1.0.0.jar` 放入伺服器的 `plugins/` 目錄
+2. 啟動伺服器一次，生成 `plugins/LDAPI/` 配置目錄
+3. 編輯 `plugins/LDAPI/config/` 下的 YAML
+4. 執行 `/ld reload` 或重啟伺服器
+
+### Maven 依賴
+
+```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
+<dependency>
+  <groupId>com.github.LongDrange</groupId>
+  <artifactId>IndieRPG</artifactId>
+  <version>v1.0.0</version>
+</dependency>
+```
+
+## 指令
+
+| 指令 | 說明 | 權限 |
+|---|---|---|
+| `/ld` | 主指令 | `ldapi.user` |
+| `/job` | 職業系統（無參數開 GUI） | `ldapi.user` |
+| `/talent` | 天賦系統 | `ldapi.user` |
+| `/party` | 隊伍 | `ldapi.user` |
+| `/guild` | 公會（無參數開 GUI） | `ldapi.user` |
+| `/dungeon` | 副本 | `ldapi.user` |
+| `/pet` | 寵物（無參數開 GUI） | `ldapi.user` |
+| `/rep` | 聲望 | `ldapi.user` |
+| `/npc talk <id>` | NPC 對話 | `ldapi.user` |
+| `/task` | 任務 | `ldapi.user` |
+| `/crate` | 寶箱 | `ldapi.user` |
+| `/spacering` | 空間戒指 | `ldapi.user` |
+| `/ld reload` | 重載配置 | `ldapi.admin` |
+
+## 權限
+
+```yaml
+permissions:
+  ldapi.admin:
+    description: 管理員權限
+    default: op
+  ldapi.user:
+    description: 一般使用者
+    default: true
+```
+
+## PlaceholderAPI 變數
+
+| 變數 | 說明 |
+|---|---|
+| `%ldapi_gold%` | 金幣數量 |
+| `%ldapi_job%` | 職業名稱 |
+| `%ldapi_job_level%` | 職業等級 |
+| `%ldapi_job_exp%` | 職業經驗 |
+| `%ldapi_battlepass_level%` | 戰令等級 |
+| `%ldapi_battlepass_xp%` | 戰令經驗 |
+| `%ldapi_talent_points%` | 天賦點 |
+| `%ldapi_rank%` | 稱號 |
+| `%ldapi_guild%` | 公會名稱 |
+| `%ldapi_guild_level%` | 公會等級 |
+| `%ldapi_party_size%` | 隊伍人數 |
+| `%ldapi_rep_<faction>%` | 指定陣營聲望 |
+| `%ldapi_attack%` | 攻擊力 |
+| `%ldapi_defense%` | 防禦力 |
+| `%ldapi_health%` | 生命值 |
+
+## 配置檔結構
+
+```
+plugins/LDAPI/
+├─ config.yml              主配置
+├─ config/
+│  ├─ general.yml          通用設定
+│  ├─ items.yml            自訂物品
+│  ├─ attributes.yml       屬性定義
+│  ├─ jobs.yml             職業定義
+│  ├─ parties.yml          隊伍設定
+│  ├─ guilds.yml           公會設定
+│  ├─ dungeons.yml         副本設定
+│  ├─ pets.yml             寵物設定
+│  ├─ reputation.yml       聲望陣營
+│  ├─ npc-dialogues.yml    NPC 對話
+│  ├─ jewelry.yml          飾品
+│  ├─ spaces.yml           空間戒指
+│  ├─ shop.yml             商店
+│  ├─ dailyreward.yml      每日獎勵
+│  └─ mythicmobs.yml       MM 整合
+├─ playerdata/             玩家資料（YAML）
+├─ dungeon-templates/      副本模板世界
+└─ logs/                   插件日誌
+```
+
+## 副本模板世界準備
+
+1. 建立新世界（如 `dungeon_goblin`），設好地形與出生點
+2. 關閉伺服器
+3. 把世界資料夾搬到 `plugins/LDAPI/dungeon-templates/dungeon_goblin/`
+4. 從 `server.properties` 移除自動載入
+5. 重啟伺服器
+
+之後 `/dungeon enter goblin_cave` 就能進入。
+
+## MythicMobs 技能範例
+
+```yaml
+WarriorSlash:
+  Skills:
+    - damage{amount=20} @target
+    - effect:particles{p=crit;amount=20} @target
+
+PetBabyWolf:
+  Type: WOLF
+  Display: '&7小狼'
+  Health: 20
+  Skills:
+    - skill{s=PetAttack} @target ~onAttack
+```
+
+## 開發
+
+- **Java 8**
+- **Maven 3.6+**
+- **Spigot API 1.12.2**
+
+```bash
+mvn clean package          # 編譯
+mvn javadoc:javadoc        # 產出 Javadoc
+mvn clean package javadoc:jar source:jar  # 三個 JAR
+```
+
+## 授權
+
+依原倉庫。

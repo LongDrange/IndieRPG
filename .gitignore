@@ -1,5 +1,6 @@
 target/
 *.jar
+!src/**/*.jar
 *.class
 .idea/
 *.iml
