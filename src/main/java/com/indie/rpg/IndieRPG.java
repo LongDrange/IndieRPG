@@ -29,6 +29,8 @@ public class IndieRPG extends JavaPlugin {
     private GuideManager guideManager;
     private ExchangeManager exchangeManager;
     private SoulBeadManager soulBeadManager;
+    private JobManager jobManager;
+    private AttributeEngine attributeEngine;
     private MythicMobsHook mythicMobsHook;
 
     @Override public void onEnable() {
@@ -54,13 +56,15 @@ public class IndieRPG extends JavaPlugin {
         guideManager = new GuideManager(this);
         exchangeManager = new ExchangeManager(this);
         soulBeadManager = new SoulBeadManager(this);
+        jobManager = new JobManager(this);
+        attributeEngine = new AttributeEngine(this);
         mythicMobsHook = new MythicMobsHook(this);
         mythicMobsHook.enable();
 
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         CommandHandler handler = new CommandHandler(this);
-        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate"})
+        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job"})
             if (getCommand(command) != null) getCommand(command).setExecutor(handler);
         getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override public void run() {
@@ -89,6 +93,7 @@ public class IndieRPG extends JavaPlugin {
         if (monsterCardManager != null) monsterCardManager.loadCards();
         if (guideManager != null) guideManager.loadEntries();
         if (soulBeadManager != null) soulBeadManager.loadBeads();
+        if (jobManager != null) jobManager.loadJobs();
     }
     public static IndieRPG getInstance() { return instance; }
     public ConfigManager getConfigManager() { return configManager; }
@@ -111,5 +116,7 @@ public class IndieRPG extends JavaPlugin {
     public GuideManager getGuideManager() { return guideManager; }
     public ExchangeManager getExchangeManager() { return exchangeManager; }
     public SoulBeadManager getSoulBeadManager() { return soulBeadManager; }
+    public JobManager getJobManager() { return jobManager; }
+    public AttributeEngine getAttributeEngine() { return attributeEngine; }
     public MythicMobsHook getMythicMobsHook() { return mythicMobsHook; }
 }

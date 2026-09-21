@@ -8,6 +8,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import com.indie.rpg.managers.JobManager;
+import java.util.Map;
 
 import java.util.List;
 
@@ -44,11 +46,41 @@ public class CommandHandler implements CommandExecutor {
             case "crate":
                 plugin.getCrateManager().openCrate(player, "common");
                 return true;
+            case "job":
+                return handleJob(player, args);
             default:
                 return false;
         }
     }
-
+    private boolean handleJob(Player player, String[] args) {
+        if (args.length < 1) {
+            PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+            if (data.job == null || data.job.isEmpty()) {
+                player.sendMessage(ChatColor.YELLOW + "你還沒有職業，可選：");
+                for (String id : plugin.getJobManager().getAll().keySet()) {
+                    player.sendMessage(ChatColor.GRAY + "  /job " + id);
+                }
+            } else {
+                JobManager.JobDefinition def = plugin.getJobManager().get(data.job);
+                long need = plugin.getJobManager().expNeeded(def, data.jobLevel);
+                player.sendMessage(ChatColor.GOLD + "職業：" + def.displayName
+                        + ChatColor.GRAY + "  等級 " + data.jobLevel
+                        + "  經驗 " + data.jobExp + "/" + need);
+            }
+            return true;
+        }
+        String sub = args[0].toLowerCase();
+        if (sub.equals("list")) {
+            for (Map.Entry<String, JobManager.JobDefinition> e
+                    : plugin.getJobManager().getAll().entrySet()) {
+                player.sendMessage(ChatColor.YELLOW + e.getKey()
+                        + ChatColor.GRAY + " - " + e.getValue().displayName);
+            }
+            return true;
+        }
+        plugin.getJobManager().setJob(player, sub);
+        return true;
+    }
     private boolean handleLDAPI(Player player, String[] args) {
         String prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("general.prefix", "&d[LDAPI] &r"));
 

@@ -1,0 +1,61 @@
+# 是否允許玩家更換職業（false 表示只能選一次）
+allow-change: true
+
+jobs:
+  warrior:
+    display-name: "&c戰士"
+    max-level: 100
+    exp-formula:
+      base: 100
+      power: 2.0
+    attributes-per-level:
+      attack: 2.0
+      defense: 1.5
+      health: 8.0
+    skills:
+      "10": "WarriorSlash"
+      "30": "WarriorWhirlwind"
+      "60": "WarriorBerserk"
+  mage:
+    display-name: "&9法師"
+    max-level: 100
+    exp-formula:
+      base: 120
+      power: 2.1
+    attributes-per-level:
+      attack: 1.5
+      health: 5.0
+      crit-chance: 0.005
+    skills:
+      "10": "MageFireball"
+      "30": "MageBlizzard"
+      "60": "MageMeteor"
+  assassin:
+    display-name: "&a刺客"
+    max-level: 100
+    exp-formula:
+      base: 110
+      power: 2.05
+    attributes-per-level:
+      attack: 2.5
+      crit-chance: 0.01
+      crit-damage: 0.02
+      health: 4.0
+    skills:
+      "10": "AssassinStab"
+      "30": "AssassinShadow"
+      "60": "AssassinAssassinate"
+  priest:
+    display-name: "&e牧師"
+    max-level: 100
+    exp-formula:
+      base: 100
+      power: 2.0
+    attributes-per-level:
+      attack: 1.0
+      defense: 1.0
+      health: 10.0
+    skills:
+      "10": "PriestHeal"
+      "30": "PriestBless"
+      "60": "PriestResurrect"

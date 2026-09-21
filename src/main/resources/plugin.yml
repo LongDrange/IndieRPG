@@ -21,6 +21,9 @@ commands:
   crate:
     description: 開啟寶箱
     aliases: [ldcrate]
+  job:
+    description: 職業系統
+    aliases: [jobs, ldjob]
 permissions:
   ldapi.admin:
     description: LDAPI 管理員權限

@@ -52,6 +52,9 @@ public class PlayerDataManager {
         data.gold = config.getInt("gold", plugin.getConfig().getInt("economy.starting-gold", 0));
         data.totalOnlineMinutes = config.getLong("online.total-minutes", 0L);
         data.lastDailyClaim = config.getLong("daily.last-claim", 0L);
+        data.job = config.getString("job", "");
+        data.jobLevel = config.getInt("job-level", 1);
+        data.jobExp = config.getLong("job-exp", 0L);
 
         if (config.isConfigurationSection("talents")) {
             for (String key : config.getConfigurationSection("talents").getKeys(false)) {
@@ -85,6 +88,9 @@ public class PlayerDataManager {
         config.set("gold", data.gold);
         config.set("online.total-minutes", data.totalOnlineMinutes);
         config.set("daily.last-claim", data.lastDailyClaim);
+        config.set("job", data.job);
+        config.set("job-level", data.jobLevel);
+        config.set("job-exp", data.jobExp);
 
         for (Map.Entry<String, Integer> e : data.talentLevels.entrySet()) {
             config.set("talents." + e.getKey(), e.getValue());
@@ -127,12 +133,19 @@ public class PlayerDataManager {
         public boolean taskActive;
         public long totalOnlineMinutes;
         public long lastDailyClaim;
-
         public Map<String, Integer> talentLevels = new HashMap<>();
         public Map<String, Long> jewelryLevels = new HashMap<>();
         public Map<String, Long> jewelryOnlineMinutes = new HashMap<>();
         public Map<String, Long> jewelryRealSeconds = new HashMap<>();
         public Map<String, Double> jewelryGrowthPoints = new HashMap<>();
+        
+        // ---- 擴充：職業 ----
+        public String job = "";
+        public int jobLevel = 1;
+        public long jobExp = 0L;
+
+        // ---- 執行時快取（不持久化）----
+        public transient Map<String, Double> computedAttributes = new HashMap<>();
 
         public PlayerData(UUID uuid) {
             this.uuid = uuid;

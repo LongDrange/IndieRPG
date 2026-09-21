@@ -10,3 +10,4 @@ target/
 playerdata/
 dungeon-templates/
 *.log
+*.zip
