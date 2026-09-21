@@ -10,7 +10,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** 中文：集中管理獨立模組配置；每個模組一份 YAML。 */
+/**
+ * 集中管理 config/ 下的獨立 YAML 配置，新增 shop、dailyreward 對應配置
+ */
 public class ConfigManager {
     private final IndieRPG plugin;
     private final File directory;
@@ -25,7 +27,7 @@ public class ConfigManager {
 
     public void reloadAll() {
         files.clear();
-        String[] names = {"general", "items", "attributes", "jewelry", "spaces", "commands", "tests"};
+        String[] names = {"general", "items", "attributes", "jewelry", "spaces", "commands", "tests", "shop", "dailyreward"};
         for (String name : names) {
             File file = new File(directory, name + ".yml");
             if (!file.exists()) {
@@ -35,7 +37,9 @@ public class ConfigManager {
                     plugin.getLogger().warning("找不到內置配置：config/" + name + ".yml");
                 }
             }
-            files.put(name, YamlConfiguration.loadConfiguration(file));
+            if (file.exists()) {
+                files.put(name, YamlConfiguration.loadConfiguration(file));
+            }
         }
     }
 
