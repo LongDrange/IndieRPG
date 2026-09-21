@@ -21,7 +21,17 @@ public class PlayerListener implements Listener {
     public PlayerListener(IndieRPG plugin) {
         this.plugin = plugin;
     }
-
+    @EventHandler
+    public void onPlayerJoin(org.bukkit.event.player.PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        plugin.getServer().getScheduler().runTaskLater(plugin, new Runnable() {
+            @Override public void run() {
+                if (plugin.getAttributeEngine() != null) {
+                    plugin.getAttributeEngine().recalculate(player);
+                }
+            }
+        }, 20L);
+    }
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();

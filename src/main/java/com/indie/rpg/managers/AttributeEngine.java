@@ -41,6 +41,11 @@ public class AttributeEngine {
             merge(total, plugin.getJobManager().calcAttributes(data));
         }
 
+        // 3. 天賦加成
+        if (plugin.getTalentManager() != null) {
+            merge(total, plugin.getTalentManager().calcAttributes(data));
+        }
+
         data.computedAttributes = total;
         applyVanilla(player, total);
     }

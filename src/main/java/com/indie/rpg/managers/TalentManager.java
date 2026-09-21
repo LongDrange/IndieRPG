@@ -38,6 +38,15 @@ public class TalentManager {
                 tree.pointsPerLevel = plugin.getConfig().getInt(path + ".points-per-level", 1);
                 tree.slot = plugin.getConfig().getInt(path + ".slot", 11);
                 tree.lore = plugin.getConfig().getStringList(path + ".lore");
+
+                org.bukkit.configuration.ConfigurationSection attrs =
+                        plugin.getConfig().getConfigurationSection(path + ".attributes-per-level");
+                if (attrs != null) {
+                    for (String k : attrs.getKeys(false)) {
+                        tree.attributesPerLevel.put(k.toLowerCase(), attrs.getDouble(k));
+                    }
+                }
+
                 trees.put(key, tree);
             }
         }
@@ -102,6 +111,54 @@ public class TalentManager {
         }
         return false;
     }
+    public Map<String, Double> calcAttributes(PlayerDataManager.PlayerData data) {
+        Map<String, Double> result = new HashMap<String, Double>();
+        for (TalentTree tree : trees.values()) {
+            int level = data.talentLevels.containsKey(tree.id)
+                    ? data.talentLevels.get(tree.id) : 0;
+            if (level <= 0) continue;
+            for (Map.Entry<String, Double> e : tree.attributesPerLevel.entrySet()) {
+                String key = e.getKey().toLowerCase();
+                Double old = result.get(key);
+                result.put(key, old == null ? e.getValue() * level : old + e.getValue() * level);
+            }
+        }
+        return result;
+    }
+
+    public boolean upgradeTalent(Player player, String treeId) {
+        TalentTree tree = trees.get(treeId);
+        if (tree == null) return false;
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        int current = data.talentLevels.containsKey(treeId) ? data.talentLevels.get(treeId) : 0;
+        if (current >= tree.maxLevel) {
+            player.sendMessage(ChatColor.RED + "該天賦已滿級。");
+            return false;
+        }
+        int cost = tree.pointsPerLevel;
+        if (data.talentPoints < cost) {
+            player.sendMessage(ChatColor.RED + "天賦點不足（需要 " + cost + " 點）。");
+            return false;
+        }
+        data.talentPoints -= cost;
+        data.talentLevels.put(treeId, current + 1);
+        if (plugin.getAttributeEngine() != null) {
+            plugin.getAttributeEngine().recalculate(player);
+        }
+        player.sendMessage(ChatColor.GREEN + "已升級天賦：" + tree.displayName
+                + " (" + (current + 1) + "/" + tree.maxLevel + ")");
+        return true;
+    }
+
+    public void handleTalentClick(Player player, int slot) {
+        for (TalentTree tree : trees.values()) {
+            if (tree.slot == slot) {
+                upgradeTalent(player, tree.id);
+                openTalentMenu(player);
+                return;
+            }
+        }
+    }
 
     public static class TalentTree {
         public String id;
@@ -111,5 +168,6 @@ public class TalentManager {
         public int pointsPerLevel;
         public int slot;
         public List<String> lore;
+        public final Map<String, Double> attributesPerLevel = new HashMap<String, Double>();
     }
 }

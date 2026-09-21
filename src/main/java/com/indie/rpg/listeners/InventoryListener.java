@@ -21,6 +21,10 @@ public class InventoryListener implements Listener {
         String title = event.getInventory().getTitle();
         if (title.contains("Talent") || title.contains("Soul Storage")) {
             event.setCancelled(true);
+            if (title.contains("Talent") && event.getWhoClicked() instanceof Player) {
+                Player p = (Player) event.getWhoClicked();
+                plugin.getTalentManager().handleTalentClick(p, event.getRawSlot());
+            }
         }
     }
 

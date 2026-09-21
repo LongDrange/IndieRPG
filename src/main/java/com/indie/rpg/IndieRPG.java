@@ -63,6 +63,7 @@ public class IndieRPG extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.CombatListener(this), this);
         CommandHandler handler = new CommandHandler(this);
         for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job"})
             if (getCommand(command) != null) getCommand(command).setExecutor(handler);

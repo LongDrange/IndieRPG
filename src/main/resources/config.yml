@@ -42,36 +42,56 @@ talent:
       icon: DIAMOND_SWORD
       max-level: 20
       points-per-level: 1
-      lore: ["&7Each level: &c+0.5 Damage", "&7Current: &f{level}/{max}"]
       slot: 11
+      lore:
+        - "&7每級：&c+0.5 攻擊力"
+        - "&7當前：&f{level}/{max}"
+      attributes-per-level:
+        attack: 0.5
     defense:
       display-name: "&9&lDefense"
       icon: IRON_CHESTPLATE
       max-level: 20
       points-per-level: 1
-      lore: ["&7Each level: &9+0.5 Armor", "&7Current: &f{level}/{max}"]
       slot: 13
+      lore:
+        - "&7每級：&9+0.5 防禦力"
+        - "&7當前：&f{level}/{max}"
+      attributes-per-level:
+        defense: 0.5
     health:
       display-name: "&a&lHealth"
       icon: APPLE
       max-level: 20
       points-per-level: 1
-      lore: ["&7Each level: &a+2 HP", "&7Current: &f{level}/{max}"]
       slot: 15
+      lore:
+        - "&7每級：&a+2 生命值"
+        - "&7當前：&f{level}/{max}"
+      attributes-per-level:
+        health: 2.0
     crit:
       display-name: "&e&lCrit"
       icon: GOLD_SWORD
       max-level: 10
       points-per-level: 2
-      lore: ["&7Each level: &e+2% Crit", "&7Current: &f{level}/{max}"]
       slot: 29
+      lore:
+        - "&7每級：&e+2% 爆擊率"
+        - "&7當前：&f{level}/{max}"
+      attributes-per-level:
+        crit-chance: 0.02
     lifesteal:
       display-name: "&4&lLifesteal"
       icon: RED_ROSE
       max-level: 10
       points-per-level: 2
-      lore: ["&7Each level: &4+1% Lifesteal", "&7Current: &f{level}/{max}"]
       slot: 31
+      lore:
+        - "&7每級：&4+1% 吸血"
+        - "&7當前：&f{level}/{max}"
+      attributes-per-level:
+        lifesteal: 0.01
 
 # ---------- Tasks ----------
 task:
