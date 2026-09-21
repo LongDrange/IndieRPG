@@ -68,10 +68,7 @@ public class CommandHandler implements CommandExecutor {
         if (args.length < 1) {
             PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
             if (data.job == null || data.job.isEmpty()) {
-                player.sendMessage(ChatColor.YELLOW + "你還沒有職業，可選：");
-                for (String id : plugin.getJobManager().getAll().keySet()) {
-                    player.sendMessage(ChatColor.GRAY + "  /job " + id);
-                }
+                new com.indie.rpg.gui.JobSelectGui(plugin).open(player);
             } else {
                 JobManager.JobDefinition def = plugin.getJobManager().get(data.job);
                 long need = plugin.getJobManager().expNeeded(def, data.jobLevel);
@@ -132,7 +129,7 @@ public class CommandHandler implements CommandExecutor {
 
     private boolean handlePet(Player player, String[] args) {
         if (args.length == 0) {
-            player.sendMessage("§e/pet summon <id>|dismiss|list");
+            new com.indie.rpg.gui.PetSelectGui(plugin).open(player);
             return true;
         }
         String sub = args[0].toLowerCase();
@@ -168,7 +165,7 @@ public class CommandHandler implements CommandExecutor {
 
     private boolean handleGuild(Player player, String[] args) {
         if (args.length == 0) {
-            player.sendMessage("§e/guild create <name>|invite <player>|accept|leave|info");
+            new com.indie.rpg.gui.GuildInfoGui(plugin).open(player);
             return true;
         }
         String sub = args[0].toLowerCase();

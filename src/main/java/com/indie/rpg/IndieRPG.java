@@ -38,6 +38,7 @@ public class IndieRPG extends JavaPlugin {
     private ReputationManager reputationManager;
     private NpcDialogueManager npcDialogueManager;
     private EquipmentManager equipmentManager;
+    private com.indie.rpg.integrations.LDAPIPlaceholders placeholders;
     private MythicMobsHook mythicMobsHook;
 
     @Override public void onEnable() {
@@ -80,6 +81,7 @@ public class IndieRPG extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.CombatListener(this), this);
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.PartyListener(this), this);
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.DungeonListener(this), this);
+        getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.GuiListener(this), this);
         CommandHandler handler = new CommandHandler(this);
         for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job", "party", "guild", "dungeon", "pet", "rep", "npc"})
             if (getCommand(command) != null) getCommand(command).setExecutor(handler);
@@ -91,6 +93,8 @@ public class IndieRPG extends JavaPlugin {
                 }
             }
         }, 1200L, 1200L);
+        placeholders = new com.indie.rpg.integrations.LDAPIPlaceholders(this);
+        placeholders.register();
         getLogger().info("LDAPI 1.0.0 已啟用（Minecraft 1.12.2 Paper）");
     }
 
@@ -146,5 +150,6 @@ public class IndieRPG extends JavaPlugin {
     public ReputationManager getReputationManager() { return reputationManager; }
     public NpcDialogueManager getNpcDialogueManager() { return npcDialogueManager; }
     public EquipmentManager getEquipmentManager() { return equipmentManager; }
+    public com.indie.rpg.integrations.LDAPIPlaceholders getPlaceholders() { return placeholders; }
     public MythicMobsHook getMythicMobsHook() { return mythicMobsHook; }
 }
