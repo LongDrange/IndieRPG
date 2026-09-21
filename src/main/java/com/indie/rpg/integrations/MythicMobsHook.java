@@ -8,10 +8,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventExecutor;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -156,9 +155,6 @@ public class MythicMobsHook implements Listener {
     private Player readKiller(Object event, LivingEntity mob) {
         Object killer = invoke(event, "getKiller", "getPlayer");
         if (killer instanceof Player) return (Player) killer;
-        if (mob != null && mob.getLastDamageCause() instanceof EntityDeathEvent) {
-            return ((EntityDeathEvent) mob.getLastDamageCause()).getEntity().getKiller();
-        }
         return mob == null ? null : mob.getKiller();
     }
 
