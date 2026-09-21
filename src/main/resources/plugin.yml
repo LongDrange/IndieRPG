@@ -3,17 +3,17 @@ version: 1.0.0
 main: com.indie.rpg.IndieRPG
 api-version: 1.12
 author: LongDrange
-description: LDAPI 中文 RPG API，支援獨立配置、Lore、飾品成長與 MythicMobs 4.13.0
+description: LDAPI 中文 RPG 核心，支援 Minecraft 1.12.2 Paper 與 MythicMobs 4.13.0
 softdepend: [MythicMobs, PlaceholderAPI]
 commands:
   ldapi:
     description: LDAPI 主指令
-    aliases: [ld, led]
+    aliases: [ld]
   spacering:
     description: 開啟空間戒指
     aliases: [sr, ldsr]
   talent:
-    description: 開啟天賦介面
+    description: 開啟天賦
     aliases: [talents, ldtalent]
   task:
     description: 開始任務
