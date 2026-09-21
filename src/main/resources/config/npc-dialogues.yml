@@ -1,0 +1,15 @@
+npc-dialogues:
+  elder:
+    npc-name: "村長"
+    lines:
+      - text: "歡迎來到我們的村莊，年輕的冒險者。"
+      - text: "最近森林裡的哥布林越來越猖獗……"
+      - text: "如果你願意幫忙，我可以給你一點報酬。"
+    reward-gold: 100
+    reward-faction: mage_guild
+    reward-rep: 50
+  blacksmith:
+    npc-name: "鐵匠"
+    lines:
+      - text: "想強化你的裝備嗎？"
+      - text: "帶上強化素材來找我吧。"

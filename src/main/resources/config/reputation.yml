@@ -1,0 +1,18 @@
+factions:
+  mage_guild:
+    name: "&9法師公會"
+    levels:
+      hated: -6000
+      hostile: -3000
+      neutral: 0
+      friendly: 3000
+      honored: 9000
+      exalted: 21000
+  hunter_guild:
+    name: "&2獵人公會"
+    levels:
+      hated: -5000
+      neutral: 0
+      friendly: 2500
+      honored: 8000
+      exalted: 20000

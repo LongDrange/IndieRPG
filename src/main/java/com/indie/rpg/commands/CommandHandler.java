@@ -56,6 +56,10 @@ public class CommandHandler implements CommandExecutor {
                 return handleDungeon(player, args);
             case "pet":
                 return handlePet(player, args);
+            case "rep":
+                return handleRep(player, args);
+            case "npc":
+                return handleNpc(player, args);
             default:
                 return false;
         }
@@ -90,6 +94,24 @@ public class CommandHandler implements CommandExecutor {
         return true;
     }
     
+    private boolean handleRep(Player player, String[] args) {
+        for (Map.Entry<String, com.indie.rpg.managers.ReputationManager.Faction> e
+                : plugin.getReputationManager().getAll().entrySet()) {
+            int v = plugin.getReputationManager().getRep(player, e.getKey());
+            String stage = plugin.getReputationManager().getStage(e.getValue(), v);
+            player.sendMessage("§7" + e.getValue().name + "§f：§e" + v + " §7(" + stage + ")");
+        }
+        return true;
+    }
+
+    private boolean handleNpc(Player player, String[] args) {
+        if (args.length >= 2 && args[0].equalsIgnoreCase("talk")) {
+            plugin.getNpcDialogueManager().talk(player, args[1]);
+        } else {
+            player.sendMessage("§e/npc talk <id>");
+        }
+        return true;
+    }
     private boolean handleDungeon(Player player, String[] args) {
         if (args.length == 0) {
             player.sendMessage("§e/dungeon list|enter <id>|leave");

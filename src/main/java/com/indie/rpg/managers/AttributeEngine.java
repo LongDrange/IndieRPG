@@ -46,6 +46,21 @@ public class AttributeEngine {
             merge(total, plugin.getTalentManager().calcAttributes(data));
         }
 
+        // 4. 公會加成
+        if (plugin.getGuildManager() != null) {
+            merge(total, plugin.getGuildManager().calcBuffs(player));
+        }
+
+        // 5. 裝備加成
+        if (plugin.getEquipmentManager() != null) {
+            merge(total, plugin.getEquipmentManager().calcAttributes(player));
+        }
+
+        // 6. 寵物加成
+        if (plugin.getPetManager() != null) {
+            merge(total, plugin.getPetManager().calcAttributes(player));
+        }
+
         data.computedAttributes = total;
         applyVanilla(player, total);
     }

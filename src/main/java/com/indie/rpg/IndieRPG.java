@@ -35,6 +35,9 @@ public class IndieRPG extends JavaPlugin {
     private GuildManager guildManager;
     private DungeonManager dungeonManager;
     private PetManager petManager;
+    private ReputationManager reputationManager;
+    private NpcDialogueManager npcDialogueManager;
+    private EquipmentManager equipmentManager;
     private MythicMobsHook mythicMobsHook;
 
     @Override public void onEnable() {
@@ -66,6 +69,9 @@ public class IndieRPG extends JavaPlugin {
         guildManager = new GuildManager(this);
         dungeonManager = new DungeonManager(this);
         petManager = new PetManager(this);
+        reputationManager = new ReputationManager(this);
+        npcDialogueManager = new NpcDialogueManager(this);
+        equipmentManager = new EquipmentManager(this);
         mythicMobsHook = new MythicMobsHook(this);
         mythicMobsHook.enable();
 
@@ -75,7 +81,7 @@ public class IndieRPG extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.PartyListener(this), this);
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.DungeonListener(this), this);
         CommandHandler handler = new CommandHandler(this);
-        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job", "party", "guild", "dungeon", "pet"})
+        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job", "party", "guild", "dungeon", "pet", "rep", "npc"})
             if (getCommand(command) != null) getCommand(command).setExecutor(handler);
         getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override public void run() {
@@ -107,6 +113,8 @@ public class IndieRPG extends JavaPlugin {
         if (jobManager != null) jobManager.loadJobs();
         if (dungeonManager != null) dungeonManager.loadDefinitions();
         if (petManager != null) petManager.loadDefinitions();
+        if (reputationManager != null) reputationManager.loadFactions();
+        if (npcDialogueManager != null) npcDialogueManager.loadDialogues();
     }
     public static IndieRPG getInstance() { return instance; }
     public ConfigManager getConfigManager() { return configManager; }
@@ -135,5 +143,8 @@ public class IndieRPG extends JavaPlugin {
     public GuildManager getGuildManager() { return guildManager; }
     public DungeonManager getDungeonManager() { return dungeonManager; }
     public PetManager getPetManager() { return petManager; }
+    public ReputationManager getReputationManager() { return reputationManager; }
+    public NpcDialogueManager getNpcDialogueManager() { return npcDialogueManager; }
+    public EquipmentManager getEquipmentManager() { return equipmentManager; }
     public MythicMobsHook getMythicMobsHook() { return mythicMobsHook; }
 }

@@ -36,6 +36,12 @@ commands:
   pet:
     description: 寵物系統
     aliases: [pets, ldpets]
+  rep:
+    description: 聲望系統
+    aliases: [reputation, ldrep]
+  npc:
+    description: NPC 對話
+    aliases: [ldnpc]
 permissions:
   ldapi.admin:
     description: LDAPI 管理員權限
