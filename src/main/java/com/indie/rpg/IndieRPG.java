@@ -44,6 +44,14 @@ public class IndieRPG extends JavaPlugin {
     @Override public void onEnable() {
         instance = this;
         saveDefaultConfig();
+
+        // 釋放文檔到 plugins/LDAPI/docs/
+        try {
+            saveResource("docs/配置手冊.md", true);
+            saveResource("docs/測試手冊.md", true);
+        } catch (Exception ex) {
+            getLogger().warning("釋放文檔失敗：" + ex.getMessage());
+        }
         configManager = new ConfigManager(this);
         playerDataManager = new PlayerDataManager(this);
         itemManager = new ItemManager(this);
