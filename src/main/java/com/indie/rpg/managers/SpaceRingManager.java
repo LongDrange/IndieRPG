@@ -8,56 +8,39 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.List;
 
+/** 中文：空間戒指使用獨立 spaces.yml 的空間名稱；舊設定仍保留兼容。 */
 public class SpaceRingManager {
-
     private final IndieRPG plugin;
-
-    public SpaceRingManager(IndieRPG plugin) {
-        this.plugin = plugin;
-    }
+    public SpaceRingManager(IndieRPG plugin) { this.plugin = plugin; }
 
     public void openSpaceRing(Player player, String matchedName) {
-        List<String> triggerItems = plugin.getConfig().getStringList("spacering.trigger-items");
         List<Integer> sizes = plugin.getConfig().getIntegerList("spacering.sizes");
-
-        int tierIndex = -1;
-        String strippedInput = ChatColor.stripColor(matchedName).trim().toLowerCase();
-        for (int i = 0; i < triggerItems.size(); i++) {
-            String strippedTrigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', triggerItems.get(i))).trim().toLowerCase();
-            if (strippedInput.contains(strippedTrigger)) {
-                tierIndex = i;
-                break;
-            }
+        int tier = 0;
+        List<String> triggers = plugin.getConfig().getStringList("spacering.trigger-items");
+        String input = ChatColor.stripColor(matchedName).toLowerCase();
+        for (int i = 0; i < triggers.size(); i++) {
+            String trigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', triggers.get(i))).toLowerCase();
+            if (input.contains(trigger)) { tier = i; break; }
         }
-
-        int size = 27;
-        if (tierIndex >= 0 && tierIndex < sizes.size()) {
-            size = sizes.get(tierIndex);
-        }
-
-        openRing(player, size, tierIndex);
+        int size = tier < sizes.size() ? sizes.get(tier) : 27;
+        openRing(player, size, tier);
     }
 
-    public boolean matchesLore(List<String> itemLores) {
-        List<String> triggerItems = plugin.getConfig().getStringList("spacering.trigger-items");
-        for (String lore : itemLores) {
-            String strippedLore = ChatColor.stripColor(lore).trim().toLowerCase();
-            for (String trigger : triggerItems) {
-                String strippedTrigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', trigger)).trim().toLowerCase();
-                if (strippedLore.contains(strippedTrigger)) {
-                    return true;
-                }
+    public boolean matchesLore(List<String> lores) {
+        for (String lore : lores) {
+            String line = ChatColor.stripColor(lore).toLowerCase();
+            for (String trigger : plugin.getConfig().getStringList("spacering.trigger-items")) {
+                if (line.contains(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', trigger)).toLowerCase())) return true;
             }
         }
         return false;
     }
 
     public void openRing(Player player, int size, int tier) {
-        size = Math.min(size, 54);
-        Inventory inv = Bukkit.createInventory(null, size,
-                ChatColor.translateAlternateColorCodes('&', "&d&lSpace Ring &7[" + size + " slots]"));
-        player.openInventory(inv);
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                plugin.getConfig().getString("general.prefix", "&d[IndieRPG] &r") + "&7Opening space ring..."));
+        size = Math.max(9, Math.min(size, 54));
+        String title = plugin.getConfigManager().get("spaces").getString("spaces.main.display-name", "&a主空間");
+        Inventory inventory = Bukkit.createInventory(null, size, ChatColor.translateAlternateColorCodes('&', title));
+        player.openInventory(inventory);
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("general.prefix", "&d[IndieRPG] &r") + "&7已開啟空間戒指。"));
     }
 }
