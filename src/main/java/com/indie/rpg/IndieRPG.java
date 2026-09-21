@@ -6,7 +6,7 @@ import com.indie.rpg.listeners.PlayerListener;
 import com.indie.rpg.managers.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/** IndieRPG 主插件類別：中文介面、獨立配置與玩家資料。 */
+/** LDAPI 主插件類別，目標核心：Minecraft 1.12.2 Paper。 */
 public class IndieRPG extends JavaPlugin {
     private static IndieRPG instance;
     private ConfigManager configManager;
@@ -47,15 +47,25 @@ public class IndieRPG extends JavaPlugin {
         guideManager = new GuideManager(this);
         exchangeManager = new ExchangeManager(this);
         soulBeadManager = new SoulBeadManager(this);
+
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         CommandHandler handler = new CommandHandler(this);
-        String[] commands = {"indierpg", "spacering", "talent", "task", "crate"};
-        for (String command : commands) if (getCommand(command) != null) getCommand(command).setExecutor(handler);
-        getServer().getScheduler().runTaskTimer(this, () -> {
-            for (org.bukkit.entity.Player player : getServer().getOnlinePlayers()) playerDataManager.addOnlineMinute(player.getUniqueId());
+        String[] commands = {"ldapi", "spacering", "talent", "task", "crate"};
+        for (String command : commands) {
+            if (getCommand(command) != null) getCommand(command).setExecutor(handler);
+        }
+
+        // 1.12.2 Paper：每 60 秒記錄在線時間；不依賴新版 API。
+        getServer().getScheduler().runTaskTimer(this, new Runnable() {
+            @Override public void run() {
+                for (org.bukkit.entity.Player player : getServer().getOnlinePlayers()) {
+                    playerDataManager.addOnlineMinute(player.getUniqueId());
+                    growthManager.addRealTime(player, "account", 60L);
+                }
+            }
         }, 1200L, 1200L);
-        getLogger().info("IndieRPG 中文 RPG 系統已啟用！");
+        getLogger().info("LDAPI 1.0.0 已啟用（Minecraft 1.12.2 Paper）");
         getLogger().info("MythicMobs：" + (getServer().getPluginManager().getPlugin("MythicMobs") != null ? "已偵測" : "未偵測到"));
     }
 
@@ -73,25 +83,25 @@ public class IndieRPG extends JavaPlugin {
         if (monsterCardManager != null) monsterCardManager.loadCards();
         if (guideManager != null) guideManager.loadEntries();
         if (soulBeadManager != null) soulBeadManager.loadBeads();
-        getLogger().info("全部配置已重新載入！");
+        getLogger().info("LDAPI 全部配置已重新載入！");
     }
 
-    public static IndieRPG getInstance() { return instance; }
-    public ConfigManager getConfigManager() { return configManager; }
-    public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
-    public ItemManager getItemManager() { return itemManager; }
-    public JewelryManager getJewelryManager() { return jewelryManager; }
-    public JewelryGrowthManager getJewelryGrowthManager() { return jewelryGrowthManager; }
-    public GrowthManager getGrowthManager() { return growthManager; }
-    public SpaceRingManager getSpaceRingManager() { return spaceRingManager; }
-    public SoulStorageManager getSoulStorageManager() { return soulStorageManager; }
-    public TalentManager getTalentManager() { return talentManager; }
-    public TaskManager getTaskManager() { return taskManager; }
-    public CrateManager getCrateManager() { return crateManager; }
-    public RankManager getRankManager() { return rankManager; }
-    public BattlePassManager getBattlePassManager() { return battlePassManager; }
-    public MonsterCardManager getMonsterCardManager() { return monsterCardManager; }
-    public GuideManager getGuideManager() { return guideManager; }
-    public ExchangeManager getExchangeManager() { return exchangeManager; }
-    public SoulBeadManager getSoulBeadManager() { return soulBeadManager; }
+    public static IndieRPG getInstance(){return instance;}
+    public ConfigManager getConfigManager(){return configManager;}
+    public PlayerDataManager getPlayerDataManager(){return playerDataManager;}
+    public ItemManager getItemManager(){return itemManager;}
+    public JewelryManager getJewelryManager(){return jewelryManager;}
+    public JewelryGrowthManager getJewelryGrowthManager(){return jewelryGrowthManager;}
+    public GrowthManager getGrowthManager(){return growthManager;}
+    public SpaceRingManager getSpaceRingManager(){return spaceRingManager;}
+    public SoulStorageManager getSoulStorageManager(){return soulStorageManager;}
+    public TalentManager getTalentManager(){return talentManager;}
+    public TaskManager getTaskManager(){return taskManager;}
+    public CrateManager getCrateManager(){return crateManager;}
+    public RankManager getRankManager(){return rankManager;}
+    public BattlePassManager getBattlePassManager(){return battlePassManager;}
+    public MonsterCardManager getMonsterCardManager(){return monsterCardManager;}
+    public GuideManager getGuideManager(){return guideManager;}
+    public ExchangeManager getExchangeManager(){return exchangeManager;}
+    public SoulBeadManager getSoulBeadManager(){return soulBeadManager;}
 }

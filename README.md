@@ -1,42 +1,60 @@
-# LDAPI v1.0.0
+# LDAPI 1.0.0
 
-Minecraft 1.12.2 Paper 中文 RPG API，支援 MythicMobs 4.13.0。
+LDAPI 是以 **Minecraft 1.12.2 Paper** 為主要核心的中文 RPG API，使用 Java 8 與 Spigot/Paper 1.12.2 API，不使用 1.13 以上專屬 API。
 
-## 新名稱與指令前綴
+## 指令
 
-- 插件名稱：`LDAPI`
-- 版本：`1.0.0`
-- 主指令：`/ldapi`
-- 短指令：`/ld`
-- 兼容別名：`/led`
-
-所有主指令都可以使用 `/ld` 前綴：
+主指令已統一為：
 
 ```text
-/ld info
-/ld reload
-/ld give <物品ID>
-/ld items
-/ld gold
-/ld rank
-/ld bp
-/ld admin reload
-/ld admin setlevel <玩家> <飾品ID> <等級>
-/ld admin addgrowth <玩家> <飾品ID> <數值>
-/ld admin resetdata <玩家>
+/ldapi
+/ld
+/led
 ```
 
-其他系統也提供 LD 別名：
+插件內部主指令名稱是 `ldapi`，`ld` 與 `led` 是別名。系統指令仍支援：
 
 ```text
-/ldsr
-/ldtalent
-/ldtask
-/ldcrate
+/sr、/ldsr
+/talent、/ldtalent
+/task、/ldtask
+/crate、/ldcrate
 ```
 
-`/sr`、`/talent`、`/task`、`/crate` 仍然保留，方便舊伺服器升級。
+## 1.12.2 Paper 兼容注意
 
-## 核心識別備注
+- 不使用 `PersistentDataContainer`。
+- 物品識別使用顯示名稱、Lore、`mythic-id`、`item-id` 與 namespace。
+- `Material` 必須使用 1.12.2 存在的名稱。
+- 玩家資料使用獨立 YAML 文件保存。
+- 在線時間每 60 秒記錄一次。
+- 現實時間以秒保存，伺服器重啟後不會歸零。
+- MythicMobs 使用軟依賴，未安裝時 LDAPI 仍可啟動。
 
-`id`、`namespace`、`material`、權限節點與 MythicMobs ID 保留英文；顯示名稱、Lore、GUI 與訊息可使用繁體中文。
+## 建置
+
+```bash
+mvn clean package
+```
+
+產出檔案：
+
+```text
+target/LDAPI-1.0.0.jar
+```
+
+## 首次啟動後資料
+
+```text
+plugins/LDAPI/
+├─ config.yml
+├─ config/
+│  ├─ general.yml
+│  ├─ items.yml
+│  ├─ attributes.yml
+│  ├─ jewelry.yml
+│  ├─ spaces.yml
+│  ├─ commands.yml
+│  └─ tests.yml
+└─ playerdata/<UUID>.yml
+```
