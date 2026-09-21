@@ -1,0 +1,22 @@
+mythicmobs:
+  enabled: true
+  api-version: "4.13.0"
+  events:
+    ldapi_boss:
+      spawn:
+        skill: LDAPI_BOSS_SPAWN
+      death:
+        gold: 500
+        battlepass-xp: 50
+        item: growth_core
+        skill: LDAPI_BOSS_DEATH
+    mythic_zombie:
+      death:
+        gold: 25
+        battlepass-xp: 10
+  drops:
+    ldapi_boss:
+      item: growth_core
+      chance: 0.25
+      gold: 100
+      battlepass-xp: 20

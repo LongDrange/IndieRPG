@@ -1,14 +1,12 @@
 package com.indie.rpg;
 
 import com.indie.rpg.commands.CommandHandler;
+import com.indie.rpg.integrations.MythicMobsHook;
 import com.indie.rpg.listeners.InventoryListener;
 import com.indie.rpg.listeners.PlayerListener;
 import com.indie.rpg.managers.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * LDAPI 主插件類別：統一初始化所有模組，支援 Paper 1.12.2。
- */
 public class IndieRPG extends JavaPlugin {
     private static IndieRPG instance;
     private ConfigManager configManager;
@@ -31,11 +29,11 @@ public class IndieRPG extends JavaPlugin {
     private GuideManager guideManager;
     private ExchangeManager exchangeManager;
     private SoulBeadManager soulBeadManager;
+    private MythicMobsHook mythicMobsHook;
 
     @Override public void onEnable() {
         instance = this;
         saveDefaultConfig();
-
         configManager = new ConfigManager(this);
         playerDataManager = new PlayerDataManager(this);
         itemManager = new ItemManager(this);
@@ -56,16 +54,14 @@ public class IndieRPG extends JavaPlugin {
         guideManager = new GuideManager(this);
         exchangeManager = new ExchangeManager(this);
         soulBeadManager = new SoulBeadManager(this);
+        mythicMobsHook = new MythicMobsHook(this);
+        mythicMobsHook.enable();
 
         getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
-
         CommandHandler handler = new CommandHandler(this);
-        String[] commands = {"ldapi", "spacering", "talent", "task", "crate"};
-        for (String command : commands) {
+        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate"})
             if (getCommand(command) != null) getCommand(command).setExecutor(handler);
-        }
-
         getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override public void run() {
                 for (org.bukkit.entity.Player player : getServer().getOnlinePlayers()) {
@@ -74,14 +70,10 @@ public class IndieRPG extends JavaPlugin {
                 }
             }
         }, 1200L, 1200L);
-
         getLogger().info("LDAPI 1.0.0 已啟用（Minecraft 1.12.2 Paper）");
     }
 
-    @Override public void onDisable() {
-        if (playerDataManager != null) playerDataManager.saveAll();
-    }
-
+    @Override public void onDisable() { if (playerDataManager != null) playerDataManager.saveAll(); }
     @Override public void reloadConfig() {
         super.reloadConfig();
         if (configManager != null) configManager.reloadAll();
@@ -97,9 +89,7 @@ public class IndieRPG extends JavaPlugin {
         if (monsterCardManager != null) monsterCardManager.loadCards();
         if (guideManager != null) guideManager.loadEntries();
         if (soulBeadManager != null) soulBeadManager.loadBeads();
-        getLogger().info("LDAPI 配置已重新載入。 ");
     }
-
     public static IndieRPG getInstance() { return instance; }
     public ConfigManager getConfigManager() { return configManager; }
     public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
@@ -121,4 +111,5 @@ public class IndieRPG extends JavaPlugin {
     public GuideManager getGuideManager() { return guideManager; }
     public ExchangeManager getExchangeManager() { return exchangeManager; }
     public SoulBeadManager getSoulBeadManager() { return soulBeadManager; }
+    public MythicMobsHook getMythicMobsHook() { return mythicMobsHook; }
 }
