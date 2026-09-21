@@ -1,0 +1,2962 @@
+﻿
+===== D:\test\test\IndieRPG-main\.github\workflows\maven.yml =====
+
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+    - name: Update dependency graph
+      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\commands\CommandHandler.java =====
+
+package com.indie.rpg.commands;
+
+import com.indie.rpg.IndieRPG;
+import com.indie.rpg.managers.PlayerDataManager;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
+
+/** LDAPI 銝餃隞方?? */
+public class CommandHandler implements CommandExecutor {
+    private final IndieRPG plugin;
+
+    public CommandHandler(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("?芣??拙振?臭誑雿輻甇斗?隞扎?);
+            return true;
+        }
+
+        Player player = (Player) sender;
+        String cmd = command.getName().toLowerCase();
+
+        switch (cmd) {
+            case "ldapi":
+                return handleLDAPI(player, args);
+            case "spacering":
+                plugin.getSpaceRingManager().openSpaceRing(player, "?脤?蝛粹???");
+                return true;
+            case "talent":
+                plugin.getTalentManager().openTalentMenu(player);
+                return true;
+            case "task":
+                plugin.getTaskManager().startTask(player);
+                return true;
+            case "crate":
+                plugin.getCrateManager().openCrate(player, "common");
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean handleLDAPI(Player player, String[] args) {
+        String prefix = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("general.prefix", "&d[LDAPI] &r"));
+
+        if (args.length == 0) {
+            player.sendMessage(ChatColor.GOLD + "=== LDAPI 1.0.0 ===");
+            player.sendMessage(ChatColor.YELLOW + "/ld info" + ChatColor.GRAY + " - ?亦??辣鞈?");
+            player.sendMessage(ChatColor.YELLOW + "/ld reload" + ChatColor.GRAY + " - ?頛?蔭");
+            player.sendMessage(ChatColor.YELLOW + "/ld give <item-id>" + ChatColor.GRAY + " - 蝯虫??拙?");
+            player.sendMessage(ChatColor.YELLOW + "/ld items" + ChatColor.GRAY + " - ?????);
+            player.sendMessage(ChatColor.YELLOW + "/ld gold" + ChatColor.GRAY + " - 瑼Ｘ?馳");
+            player.sendMessage(ChatColor.YELLOW + "/ld rank" + ChatColor.GRAY + " - ?亦?蝔梯?");
+            player.sendMessage(ChatColor.YELLOW + "/ld bp" + ChatColor.GRAY + " - ?唬誘?脣漲");
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("info")) {
+            player.sendMessage(prefix + "?嚗?.0.0");
+            player.sendMessage(ChatColor.GRAY + "?詨?嚗inecraft 1.12.2 Paper");
+            player.sendMessage(ChatColor.GRAY + "MythicMobs: " + (plugin.getServer().getPluginManager().getPlugin("MythicMobs") != null ? "撌脣皜? : "?芸皜砍"));
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("reload")) {
+            if (!player.hasPermission("ldapi.admin")) {
+                player.sendMessage(ChatColor.RED + "雿???LDAPI 蝞∠??⊥???);
+                return true;
+            }
+            plugin.reloadConfig();
+            player.sendMessage(prefix + ChatColor.GREEN + "?蔭撌脤??啗??乓?);
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("give")) {
+            if (args.length < 2) {
+                player.sendMessage(ChatColor.RED + "?冽?嚗?ld give <item-id>");
+                return true;
+            }
+            ItemStack item = plugin.getItemManager().getItem(args[1]);
+            if (item == null) {
+                player.sendMessage(ChatColor.RED + "?芰?拙?嚗? + args[1]);
+                return true;
+            }
+            player.getInventory().addItem(item);
+            player.sendMessage(prefix + ChatColor.GRAY + "撌脩策鈭?" + args[1]);
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("items")) {
+            List<String> ids = plugin.getItemManager().getItemIds();
+            player.sendMessage(ChatColor.GOLD + "?芸?蝢拍??" + ids.size() + "嚗?");
+            for (String id : ids) {
+                player.sendMessage(ChatColor.YELLOW + "  /ld give " + id);
+            }
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("gold")) {
+            PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+            player.sendMessage(prefix + ChatColor.GRAY + "?馳嚗? + ChatColor.GOLD + data.gold);
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("rank")) {
+            PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+            player.sendMessage(prefix + ChatColor.GRAY + "蝔梯?嚗? + plugin.getRankManager().getRankDisplay(data.rank));
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("bp")) {
+            plugin.getBattlePassManager().showProgress(player);
+            return true;
+        }
+
+        if (args[0].equalsIgnoreCase("admin")) {
+            return adminCommands(player, args);
+        }
+
+        player.sendMessage(ChatColor.RED + "?芰?誘嚗撓??/ld ?亦?撟怠??);
+        return true;
+    }
+
+    private boolean adminCommands(Player player, String[] args) {
+        if (!player.hasPermission("ldapi.admin")) {
+            player.sendMessage(ChatColor.RED + "雿???LDAPI 蝞∠??⊥???);
+            return true;
+        }
+        if (args.length < 2) {
+            player.sendMessage(ChatColor.YELLOW + "/ld admin reload|setlevel|addgrowth|resetdata");
+            return true;
+        }
+
+        if (args[1].equalsIgnoreCase("reload")) {
+            plugin.reloadConfig();
+            player.sendMessage(ChatColor.GREEN + "LDAPI 撌脤??啗??乓?);
+            return true;
+        }
+
+        if (args[1].equalsIgnoreCase("setlevel") && args.length >= 5) {
+            Player target = plugin.getServer().getPlayer(args[2]);
+            if (target == null) {
+                player.sendMessage(ChatColor.RED + "?曆??啣蝺摰塚?" + args[2]);
+                return true;
+            }
+            try {
+                long value = Long.parseLong(args[4]);
+                plugin.getPlayerDataManager().getPlayerData(target).jewelryLevels.put(args[3], value);
+                player.sendMessage(ChatColor.GREEN + "撌脰身摰ˇ??蝝?);
+            } catch (NumberFormatException e) {
+                player.sendMessage(ChatColor.RED + "蝑?敹??舀摮?);
+            }
+            return true;
+        }
+
+        if (args[1].equalsIgnoreCase("addgrowth") && args.length >= 5) {
+            Player target = plugin.getServer().getPlayer(args[2]);
+            if (target == null) {
+                player.sendMessage(ChatColor.RED + "?曆??啣蝺摰塚?" + args[2]);
+                return true;
+            }
+            try {
+                double value = Double.parseDouble(args[4]);
+                PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(target);
+                data.jewelryGrowthPoints.put(args[3], data.jewelryGrowthPoints.containsKey(args[3]) ? data.jewelryGrowthPoints.get(args[3]) + value : value);
+                player.sendMessage(ChatColor.GREEN + "撌脣????琿??詻?);
+            } catch (NumberFormatException e) {
+                player.sendMessage(ChatColor.RED + "?詨潭撘隤扎?);
+            }
+            return true;
+        }
+
+        if (args[1].equalsIgnoreCase("resetdata") && args.length >= 3) {
+            Player target = plugin.getServer().getPlayer(args[2]);
+            if (target != null) {
+                PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(target);
+                data.jewelryLevels.clear();
+                data.jewelryGrowthPoints.clear();
+                player.sendMessage(ChatColor.GREEN + "撌脤?蝵桃摰園ˇ????);
+            }
+            return true;
+        }
+
+        player.sendMessage(ChatColor.YELLOW + "?冽?嚗?ld admin reload|setlevel|addgrowth|resetdata");
+        return true;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\integrations\MythicMobsHook.java =====
+
+package com.indie.rpg.integrations;
+
+import com.indie.rpg.IndieRPG;
+import com.indie.rpg.managers.PlayerDataManager;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.plugin.EventExecutor;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
+
+import java.lang.reflect.Method;
+import java.util.Locale;
+import java.util.Random;
+
+/**
+ * Optional MythicMobs 4.x bridge. No MythicMobs classes are referenced directly,
+ * so LDAPI can still load when MythicMobs is absent.
+ */
+public class MythicMobsHook implements Listener {
+    private final IndieRPG plugin;
+    private final Random random = new Random();
+    private Object apiHelper;
+    private boolean enabled;
+
+    public MythicMobsHook(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    public void enable() {
+        if (!plugin.getConfigManager().get("mythicmobs").getBoolean("mythicmobs.enabled", true)) {
+            plugin.getLogger().info("MythicMobs ?游?撌脣?蔭銝剖??具?);
+            return;
+        }
+        Plugin mythic = Bukkit.getPluginManager().getPlugin("MythicMobs");
+        if (mythic == null || !mythic.isEnabled()) {
+            plugin.getLogger().info("MythicMobs ?芸?鋆?頝喲? API ?游???);
+            return;
+        }
+        try {
+            Class<?> bridge = Class.forName("io.lumine.xikage.mythicmobs.bukkit.MythicBukkit");
+            Object instance = bridge.getMethod("inst").invoke(null);
+            apiHelper = instance.getClass().getMethod("getAPIHelper").invoke(instance);
+            enabled = apiHelper != null;
+            registerEvent("io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent", "spawn");
+            registerEvent("io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent", "death");
+            plugin.getLogger().info("MythicMobs API ?游?撌脣??具?);
+        } catch (Exception ex) {
+            enabled = false;
+            plugin.getLogger().warning("MythicMobs API ???仃??" + ex.getClass().getSimpleName());
+        }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /** ?澆 MythicMobs APIHelper.castSkill嚗?港???4.x ?寞??????*/
+    public boolean castSkill(LivingEntity caster, String skill) {
+        if (!enabled || caster == null || skill == null || skill.trim().isEmpty()) return false;
+        try {
+            for (Method method : apiHelper.getClass().getMethods()) {
+                if (!"castSkill".equals(method.getName()) || method.getParameterTypes().length != 2) continue;
+                Class<?>[] types = method.getParameterTypes();
+                Object[] args;
+                if (types[0].isAssignableFrom(String.class) && types[1].isAssignableFrom(caster.getClass())) {
+                    args = new Object[]{skill, caster};
+                } else if (types[0].isAssignableFrom(caster.getClass()) && types[1].isAssignableFrom(String.class)) {
+                    args = new Object[]{caster, skill};
+                } else {
+                    continue;
+                }
+                Object result = method.invoke(apiHelper, args);
+                return !(result instanceof Boolean) || (Boolean) result;
+            }
+        } catch (Exception ex) {
+            plugin.getLogger().warning("?賣 MythicMobs ??賢仃??" + skill);
+        }
+        return false;
+    }
+
+    private void registerEvent(String className, final String type) {
+        try {
+            final Class<?> eventClass = Class.forName(className);
+            EventExecutor executor = new EventExecutor() {
+                @Override public void execute(Listener ignored, Event event) {
+                    handleMythicEvent(event, type);
+                }
+            };
+            Bukkit.getPluginManager().registerEvent((Class<? extends Event>) eventClass, this,
+                    EventPriority.NORMAL, executor, plugin);
+        } catch (ClassNotFoundException ex) {
+            plugin.getLogger().warning("?曆???MythicMobs 鈭辣憿嚗? + className);
+        }
+    }
+
+    private void handleMythicEvent(Event event, String type) {
+        String mobId = readMobId(event);
+        if (mobId == null) return;
+        ConfigurationSection root = plugin.getConfigManager().get("mythicmobs")
+                .getConfigurationSection("mythicmobs.events");
+        if (root == null) return;
+        ConfigurationSection rule = root.getConfigurationSection(mobId.toLowerCase(Locale.ENGLISH));
+        if (rule == null) return;
+
+        LivingEntity mob = readLivingEntity(event);
+        Player killer = readKiller(event, mob);
+        String skill = rule.getString(type + ".skill");
+        if (skill != null && mob != null) castSkill(mob, skill);
+
+        if ("death".equals(type) && killer != null) {
+            giveDeathRewards(killer, rule.getConfigurationSection("death"));
+        }
+    }
+
+    private void giveDeathRewards(Player player, ConfigurationSection reward) {
+        if (reward == null) return;
+        double chance = reward.getDouble("chance", 1.0D);
+        if (chance < 1.0D && random.nextDouble() > chance) return;
+
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.gold += Math.max(0, reward.getInt("gold", 0));
+        int xp = reward.getInt("battlepass-xp", 0);
+        if (xp > 0) plugin.getBattlePassManager().addXP(player, xp);
+
+        String itemId = reward.getString("item");
+        if (itemId != null && !itemId.trim().isEmpty()) {
+            ItemStack item = plugin.getItemManager().getItem(itemId);
+            if (item != null) player.getInventory().addItem(item);
+        }
+        String command = reward.getString("command");
+        if (command != null && !command.trim().isEmpty()) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
+        }
+    }
+
+    private String readMobId(Object event) {
+        Object mob = invoke(event, "getMob", "getMythicMob");
+        Object type = mob == null ? null : invoke(mob, "getType");
+        Object value = type == null ? null : invoke(type, "getInternalName", "getName");
+        if (value == null) value = invoke(event, "getMobType", "getMobName", "getMobId");
+        return value == null ? null : String.valueOf(value).toLowerCase(Locale.ENGLISH);
+    }
+
+    private LivingEntity readLivingEntity(Object event) {
+        Object value = invoke(event, "getEntity", "getBukkitEntity");
+        return value instanceof LivingEntity ? (LivingEntity) value : null;
+    }
+
+    private Player readKiller(Object event, LivingEntity mob) {
+        Object killer = invoke(event, "getKiller", "getPlayer");
+        if (killer instanceof Player) return (Player) killer;
+        return mob == null ? null : mob.getKiller();
+    }
+
+    private Object invoke(Object target, String... names) {
+        if (target == null) return null;
+        for (String name : names) {
+            try { return target.getClass().getMethod(name).invoke(target); }
+            catch (Exception ignored) { }
+        }
+        return null;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\listeners\InventoryListener.java =====
+
+package com.indie.rpg.listeners;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+
+public class InventoryListener implements Listener {
+
+    private final IndieRPG plugin;
+
+    public InventoryListener(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        String title = event.getInventory().getTitle();
+        if (title.contains("Talent") || title.contains("Soul Storage")) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getEntity().getKiller() instanceof Player) {
+            Player killer = event.getEntity().getKiller();
+            int killXp = plugin.getConfig().getInt("battlepass.kill-xp", 5);
+            plugin.getTaskManager().onEntityKill(killer, event.getEntity());
+            plugin.getBattlePassManager().addXP(killer, killXp);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        plugin.getPlayerDataManager().saveData(event.getPlayer().getUniqueId());
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\listeners\PlayerListener.java =====
+
+package com.indie.rpg.listeners;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class PlayerListener implements Listener {
+
+    private final IndieRPG plugin;
+
+    public PlayerListener(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+
+        if (item == null || item.getType() == Material.AIR) return;
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return;
+
+        String displayName = meta.hasDisplayName() ? meta.getDisplayName() : "";
+        List<String> lores = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+
+        // Space Ring (check name + lore)
+        if (plugin.getSpaceRingManager().matchesLore(lores) || matchesAny(displayName,
+                plugin.getConfig().getStringList("spacering.trigger-items"))) {
+            event.setCancelled(true);
+            plugin.getSpaceRingManager().openSpaceRing(player, displayName);
+            return;
+        }
+
+        // Soul Storage
+        if (plugin.getSoulStorageManager().matchesLore(lores) || matchesAny(displayName,
+                plugin.getConfig().getStringList("soulstorage.trigger-items"))) {
+            event.setCancelled(true);
+            plugin.getSoulStorageManager().openSoulStorage(player, 0);
+            return;
+        }
+
+        // Crates
+        String crateTier = plugin.getCrateManager().detectTier(displayName);
+        if (crateTier == null) {
+            crateTier = plugin.getCrateManager().detectTierFromLore(lores);
+        }
+        if (crateTier != null) {
+            event.setCancelled(true);
+            plugin.getCrateManager().openCrate(player, crateTier);
+            item.setAmount(item.getAmount() - 1);
+            return;
+        }
+
+        // Talent Point
+        if (plugin.getTalentManager().matchesLore(lores) || displayName.toLowerCase().contains("talent point")) {
+            event.setCancelled(true);
+            plugin.getTalentManager().addTalentPoint(player, 1);
+            item.setAmount(item.getAmount() - 1);
+            return;
+        }
+
+        // BattlePass Token
+        if (displayName.toLowerCase().contains("battlepass") ||
+                containsLore(lores, "battlepass") || containsLore(lores, "?誘")) {
+            event.setCancelled(true);
+            int xp = 10;
+            plugin.getBattlePassManager().addXP(player, xp);
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "+" + xp + " BattlePass XP!");
+            item.setAmount(item.getAmount() - 1);
+            return;
+        }
+
+        // Rank / Title
+        String rankId = plugin.getRankManager().detectRankFromName(displayName);
+        if (rankId == null) {
+            rankId = plugin.getRankManager().detectRankFromLore(lores);
+        }
+        if (rankId != null) {
+            event.setCancelled(true);
+            plugin.getRankManager().setRank(player, rankId);
+            item.setAmount(item.getAmount() - 1);
+            return;
+        }
+    }
+
+    private boolean matchesAny(String displayName, List<String> triggers) {
+        String strippedName = ChatColor.stripColor(displayName).toLowerCase();
+        for (String trigger : triggers) {
+            String strippedTrigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', trigger)).toLowerCase();
+            if (strippedName.contains(strippedTrigger)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsLore(List<String> lores, String keyword) {
+        for (String lore : lores) {
+            if (ChatColor.stripColor(lore).toLowerCase().contains(keyword.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\AttributeManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * ?芸?蝢拙惇?抒恣?嚗???config/attributes.yml嚗?游?砍惇?批?蝢押?銝???GUI 撅內?? */
+public class AttributeManager {
+    private final IndieRPG plugin;
+    private final Map<String, AttributeEntry> attributes = new LinkedHashMap<>();
+
+    public AttributeManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadAttributes();
+    }
+
+    public void loadAttributes() {
+        attributes.clear();
+        ConfigurationSection root = plugin.getConfigManager().get("attributes").getConfigurationSection("attributes");
+        if (root == null) {
+            plugin.getLogger().warning("?芣??attributes.yml 銝剔? attributes 蝭暺?);
+            return;
+        }
+        for (String key : root.getKeys(false)) {
+            ConfigurationSection section = root.getConfigurationSection(key);
+            if (section == null) continue;
+            AttributeEntry entry = new AttributeEntry();
+            entry.id = key;
+            entry.displayName = ChatColor.translateAlternateColorCodes('&', section.getString("display-name", key));
+            entry.defaultValue = section.getDouble("default", 0D);
+            entry.minValue = section.getDouble("min", 0D);
+            entry.maxValue = section.getDouble("max", 1000000D);
+            attributes.put(key.toLowerCase(), entry);
+        }
+        plugin.getLogger().info("撌脰???" + attributes.size() + " ?惇?批?蝢?);
+    }
+
+    public double getDefaultValue(String attributeId) {
+        AttributeEntry entry = attributes.get(attributeId.toLowerCase());
+        return entry == null ? 0D : entry.defaultValue;
+    }
+
+    public double getMinValue(String attributeId) {
+        AttributeEntry entry = attributes.get(attributeId.toLowerCase());
+        return entry == null ? 0D : entry.minValue;
+    }
+
+    public double getMaxValue(String attributeId) {
+        AttributeEntry entry = attributes.get(attributeId.toLowerCase());
+        return entry == null ? 1000000D : entry.maxValue;
+    }
+
+    public Inventory openAttributeGui(Player player) {
+        Inventory inventory = Bukkit.createInventory(null, 27, ChatColor.GOLD + "LDAPI 撅祆批?銵?);
+        int slot = 0;
+        for (AttributeEntry entry : attributes.values()) {
+            ItemStack item = new ItemStack(Material.BOOK);
+            ItemMeta meta = item.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(entry.displayName);
+                List<String> lore = new ArrayList<>();
+                lore.add(ChatColor.GRAY + "?身?潘?" + entry.defaultValue);
+                lore.add(ChatColor.GRAY + "蝭?嚗? + entry.minValue + " ~ " + entry.maxValue);
+                meta.setLore(lore);
+                item.setItemMeta(meta);
+            }
+            inventory.setItem(slot++, item);
+            if (slot >= inventory.getSize()) break;
+        }
+        player.openInventory(inventory);
+        return inventory;
+    }
+
+    public static class AttributeEntry {
+        public String id;
+        public String displayName;
+        public double defaultValue;
+        public double minValue;
+        public double maxValue;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\BattlePassManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+
+public class BattlePassManager {
+
+    private final IndieRPG plugin;
+
+    public BattlePassManager(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    public void addXP(Player player, int amount) {
+        if (!plugin.getConfig().getBoolean("battlepass.enabled", true)) return;
+
+        int xpPerLevel = plugin.getConfig().getInt("battlepass.xp-per-level", 100);
+        int maxLevel = plugin.getConfig().getInt("battlepass.max-level", 50);
+        int milestoneEvery = plugin.getConfig().getInt("battlepass.milestone-every", 10);
+        int milestonePoints = plugin.getConfig().getInt("battlepass.milestone-rewards.talent-points", 5);
+        int milestoneGold = plugin.getConfig().getInt("battlepass.milestone-rewards.gold", 500);
+        int goldPerLevel = plugin.getConfig().getInt("battlepass.gold-per-level", 10);
+
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.battlePassXP += amount;
+
+        while (data.battlePassXP >= xpPerLevel && data.battlePassLevel < maxLevel) {
+            data.battlePassXP -= xpPerLevel;
+            data.battlePassLevel++;
+
+            player.sendMessage(ChatColor.LIGHT_PURPLE + "[BattlePass] " + ChatColor.RESET +
+                    "Level up! Level " + data.battlePassLevel);
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+
+            data.gold += goldPerLevel * data.battlePassLevel;
+
+            if (data.battlePassLevel % milestoneEvery == 0) {
+                data.gold += milestoneGold;
+                plugin.getTalentManager().addTalentPoint(player, milestonePoints);
+                player.sendMessage(ChatColor.GOLD + "[BattlePass] Milestone! +" + milestoneGold + " Gold, +" + milestonePoints + " Talent Points");
+            }
+        }
+    }
+
+    public void showProgress(Player player) {
+        int xpPerLevel = plugin.getConfig().getInt("battlepass.xp-per-level", 100);
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        player.sendMessage(ChatColor.LIGHT_PURPLE + "[BattlePass] " + ChatColor.RESET +
+                "Level: " + data.battlePassLevel + " | XP: " + data.battlePassXP + "/" + xpPerLevel);
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\ConfigManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/** ?葉蝞∠? plugins/LDAPI/config 銝? YAML??*/
+public class ConfigManager {
+    private final IndieRPG plugin;
+    private final File directory;
+    private final Map<String, FileConfiguration> files = new LinkedHashMap<>();
+
+    public ConfigManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        this.directory = new File(plugin.getDataFolder(), "config");
+        if (!directory.exists()) directory.mkdirs();
+        reloadAll();
+    }
+
+    public void reloadAll() {
+        files.clear();
+        String[] names = {"general", "items", "attributes", "jewelry", "spaces", "commands", "tests", "shop", "dailyreward", "mythicmobs"};
+        for (String name : names) {
+            File file = new File(directory, name + ".yml");
+            if (!file.exists()) {
+                try { plugin.saveResource("config/" + name + ".yml", false); }
+                catch (IllegalArgumentException ignored) { plugin.getLogger().warning("?曆??啣蝵桅?蝵殷?config/" + name + ".yml"); }
+            }
+            if (file.exists()) files.put(name, YamlConfiguration.loadConfiguration(file));
+        }
+    }
+
+    public FileConfiguration get(String name) {
+        FileConfiguration config = files.get(name);
+        return config == null ? new YamlConfiguration() : config;
+    }
+
+    public Map<String, FileConfiguration> getAll() { return Collections.unmodifiableMap(files); }
+
+    public void save(String name) throws IOException {
+        FileConfiguration config = files.get(name);
+        if (config != null) config.save(new File(directory, name + ".yml"));
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\CrateManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+public class CrateManager {
+
+    private final IndieRPG plugin;
+    private final Random random = new Random();
+    private final List<CrateTier> tiers = new ArrayList<>();
+
+    public CrateManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadRewards();
+    }
+
+    public void loadRewards() {
+        tiers.clear();
+        if (!plugin.getConfig().contains("crate.rewards")) return;
+
+        for (String tierName : plugin.getConfig().getConfigurationSection("crate.rewards").getKeys(false)) {
+            String path = "crate.rewards." + tierName;
+            CrateTier tier = new CrateTier();
+            tier.name = tierName;
+
+            List<Map<?, ?>> rewardMaps = plugin.getConfig().getMapList(path);
+            for (Map<?, ?> map : rewardMaps) {
+                CrateReward reward = new CrateReward();
+                reward.chance = ((Number) map.get("chance")).floatValue();
+                reward.gold = ((Number) map.get("gold")).intValue();
+                reward.talentPoints = ((Number) map.get("talent-points")).intValue();
+                reward.battlepassXp = ((Number) map.get("battlepass-xp")).intValue();
+                tier.rewards.add(reward);
+            }
+            tiers.add(tier);
+        }
+        plugin.getLogger().info("Loaded " + tiers.size() + " crate tiers");
+    }
+
+    public String detectTier(String itemName) {
+        String strippedName = ChatColor.stripColor(itemName).toLowerCase();
+        if (plugin.getConfig().contains("crate.trigger-items")) {
+            for (String tier : plugin.getConfig().getConfigurationSection("crate.trigger-items").getKeys(false)) {
+                List<String> names = plugin.getConfig().getStringList("crate.trigger-items." + tier);
+                for (String name : names) {
+                    String strippedTrigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', name)).toLowerCase();
+                    if (strippedName.contains(strippedTrigger)) {
+                        return tier;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public String detectTierFromLore(List<String> lores) {
+        for (String lore : lores) {
+            String tier = detectTier(lore);
+            if (tier != null) return tier;
+        }
+        return null;
+    }
+
+    public void openCrate(Player player, String tierName) {
+        CrateTier tier = null;
+        for (CrateTier t : tiers) {
+            if (t.name.equalsIgnoreCase(tierName)) {
+                tier = t;
+                break;
+            }
+        }
+        if (tier == null) {
+            player.sendMessage(ChatColor.RED + "Unknown crate tier: " + tierName);
+            return;
+        }
+
+        player.playSound(player.getLocation(), Sound.BLOCK_CHEST_OPEN, 1f, 1f);
+
+        float roll = random.nextFloat();
+        float cumulative = 0;
+        CrateReward won = tier.rewards.get(tier.rewards.size() - 1);
+
+        for (CrateReward reward : tier.rewards) {
+            cumulative += reward.chance;
+            if (roll <= cumulative) {
+                won = reward;
+                break;
+            }
+        }
+
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.gold += won.gold;
+        if (won.talentPoints > 0) plugin.getTalentManager().addTalentPoint(player, won.talentPoints);
+        if (won.battlepassXp > 0) plugin.getBattlePassManager().addXP(player, won.battlepassXp);
+
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                plugin.getConfig().getString("general.prefix", "&d[IndieRPG] &r") +
+                "&7Opening &6" + tier.name + " &7crate..."));
+        player.sendMessage(ChatColor.GOLD + "  +" + won.gold + " Gold" +
+                (won.talentPoints > 0 ? "  +" + won.talentPoints + " Talent Points" : "") +
+                (won.battlepassXp > 0 ? "  +" + won.battlepassXp + " BattlePass XP" : ""));
+
+        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1.5f);
+    }
+
+    public static class CrateTier {
+        public String name;
+        public List<CrateReward> rewards = new ArrayList<>();
+    }
+
+    public static class CrateReward {
+        public float chance;
+        public int gold;
+        public int talentPoints;
+        public int battlepassXp;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\DailyRewardManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.*;
+
+/**
+ * 瘥?蝟餌絞嚗?湔??亦偷?啜?颯UI 撅內?? */
+public class DailyRewardManager {
+    private final IndieRPG plugin;
+    private final Map<UUID, Long> lastClaim = new HashMap<>();
+
+    public DailyRewardManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadRewards();
+    }
+
+    public void loadRewards() {
+        ConfigurationSection section = plugin.getConfigManager().get("dailyreward").getConfigurationSection("dailyreward.rewards");
+        if (section == null) {
+            plugin.getLogger().warning("?芣??dailyreward.rewards ?蔭嚗蝙?券?閮剜??亦???);
+            return;
+        }
+        // 霈??蝵殷?敺??舀????蝪賢.
+    }
+
+    public boolean canClaim(Player player) {
+        long now = System.currentTimeMillis();
+        long last = lastClaim.getOrDefault(player.getUniqueId(), 0L);
+        long cooldownMillis = 1000L * 60L * 60L * plugin.getConfig().getInt("dailyreward.cooldown-hours", 24);
+        return (now - last) >= cooldownMillis;
+    }
+
+    public boolean claimDaily(Player player) {
+        if (!canClaim(player)) {
+            player.sendMessage(ChatColor.RED + "雿?瘝??圈?瘥蝪賢????);
+            return false;
+        }
+
+        int gold = plugin.getConfig().getInt("dailyreward.gold", 100);
+        int xp = plugin.getConfig().getInt("dailyreward.xp", 25);
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.gold += gold;
+        lastClaim.put(player.getUniqueId(), System.currentTimeMillis());
+        data.lastDailyClaim = System.currentTimeMillis();
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("dailyreward.message", "&e[瘥?] &7撌脤???))
+            .replace("{gold}", String.valueOf(gold)).replace("{xp}", String.valueOf(xp)));
+        return true;
+    }
+
+    public Inventory openRewardGui(Player player) {
+        Inventory inv = Bukkit.createInventory(null, 27, ChatColor.GOLD + "LDAPI 瘥蝪賢");
+        ItemStack item = new ItemStack(Material.CHEST);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.GREEN + "??瘥?");
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "?馳嚗? + plugin.getConfig().getInt("dailyreward.gold", 100));
+            lore.add(ChatColor.GRAY + "蝬?嚗? + plugin.getConfig().getInt("dailyreward.xp", 25));
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+        }
+        inv.setItem(13, item);
+        player.openInventory(inv);
+        return inv;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\ExchangeManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ExchangeManager {
+
+    private final IndieRPG plugin;
+
+    public ExchangeManager(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    public void openExchange(Player player) {
+        Inventory inv = Bukkit.createInventory(null, 27,
+                ChatColor.translateAlternateColorCodes('&', "&a&lItem Exchange"));
+
+        if (plugin.getConfig().contains("exchange.rules")) {
+            int slot = 10;
+            for (String matName : plugin.getConfig().getConfigurationSection("exchange.rules").getKeys(false)) {
+                String path = "exchange.rules." + matName;
+                int cost = plugin.getConfig().getInt(path + ".cost", 1);
+                String reward = plugin.getConfig().getString(path + ".reward", "");
+
+                ItemStack item = new ItemStack(Material.matchMaterial(matName));
+                ItemMeta meta = item.getItemMeta();
+                meta.setDisplayName(ChatColor.GOLD + matName + " Exchange");
+                List<String> lore = new ArrayList<>();
+                lore.add(ChatColor.GRAY + "Cost: " + cost + " " + matName);
+                lore.add(ChatColor.GRAY + "Reward: " + reward);
+                lore.add("");
+                lore.add(ChatColor.YELLOW + "Click to exchange!");
+                meta.setLore(lore);
+                item.setItemMeta(meta);
+
+                inv.setItem(slot, item);
+                slot++;
+            }
+        }
+
+        ItemStack trash = new ItemStack(Material.LAVA_BUCKET);
+        ItemMeta trashMeta = trash.getItemMeta();
+        trashMeta.setDisplayName(ChatColor.DARK_RED + "Trash Can");
+        trashMeta.setLore(java.util.Collections.singletonList(ChatColor.GRAY + "Drop items here to delete"));
+        trash.setItemMeta(trashMeta);
+        inv.setItem(22, trash);
+
+        player.openInventory(inv);
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\GrowthManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import com.indie.rpg.util.ItemLoreUtil;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+/** 憌曉??靘?嚗?蝺??撖行????寞??拙???*/
+public class GrowthManager {
+    private final IndieRPG plugin;
+    public GrowthManager(IndieRPG plugin) { this.plugin = plugin; }
+    public void addOnlineMinute(Player player, String jewelryId) {
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.totalOnlineMinutes++;
+        data.jewelryOnlineMinutes.put(jewelryId, data.jewelryOnlineMinutes.containsKey(jewelryId) ? data.jewelryOnlineMinutes.get(jewelryId) + 1L : 1L);
+    }
+    public void addRealTime(Player player, String jewelryId, long seconds) {
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.jewelryRealSeconds.put(jewelryId, data.jewelryRealSeconds.containsKey(jewelryId) ? data.jewelryRealSeconds.get(jewelryId) + seconds : seconds);
+    }
+    public boolean useGrowthItem(Player player, String jewelryId, ItemStack item) {
+        String id = ItemLoreUtil.value(item, "item-id");
+        if (id == null) id = ItemLoreUtil.value(item, "indierpg-id");
+        if (id == null || !id.equalsIgnoreCase("growth_core")) return false;
+        if (item.getAmount() > 1) item.setAmount(item.getAmount() - 1); else player.getInventory().removeItem(item);
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.jewelryGrowthPoints.put(jewelryId, data.jewelryGrowthPoints.containsKey(jewelryId) ? data.jewelryGrowthPoints.get(jewelryId) + 1D : 1D);
+        return true;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\GuideManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.*;
+
+public class GuideManager {
+
+    private final IndieRPG plugin;
+    private final Map<String, GuideEntry> entries = new HashMap<>();
+
+    public GuideManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadEntries();
+    }
+
+    public void loadEntries() {
+        entries.clear();
+        if (plugin.getConfig().contains("guide.entries")) {
+            for (String key : plugin.getConfig().getConfigurationSection("guide.entries").getKeys(false)) {
+                String path = "guide.entries." + key;
+                GuideEntry entry = new GuideEntry();
+                entry.id = key;
+                entry.mobs = plugin.getConfig().getStringList(path + ".mobs");
+                entry.requiredKills = plugin.getConfig().getInt(path + ".required-kills", 10);
+                entry.unlockChance = plugin.getConfig().getDouble(path + ".unlock-chance", 25.0);
+                entry.reward = plugin.getConfig().getString(path + ".reward", "");
+                entry.effect = plugin.getConfig().getString(path + ".effect", "");
+                entries.put(key, entry);
+            }
+        }
+        plugin.getLogger().info("Loaded " + entries.size() + " guide entries");
+    }
+
+    public void onMonsterKill(Player player, LivingEntity entity, PlayerDataManager.PlayerData data) {
+        String mobType = entity.getType().name().toLowerCase();
+        Set<String> unlocked = getUnlockedEntries(data);
+
+        for (GuideEntry entry : entries.values()) {
+            if (unlocked.contains(entry.id)) continue;
+
+            boolean matches = false;
+            for (String mob : entry.mobs) {
+                if (mobType.contains(mob.toLowerCase()) || mob.toLowerCase().contains(mobType)) {
+                    matches = true;
+                    break;
+                }
+            }
+            if (!matches) continue;
+
+            if (Math.random() * 100 < entry.unlockChance) {
+                unlocked.add(entry.id);
+                player.sendMessage(ChatColor.GREEN + "[Guide] " + ChatColor.RESET +
+                        "Unlocked entry: " + entry.id + "!");
+
+                if (!entry.effect.isEmpty()) {
+                    applyEffect(player, entry.effect);
+                }
+            }
+        }
+    }
+
+    public Set<String> getUnlockedEntries(PlayerDataManager.PlayerData data) {
+        return new HashSet<>();
+    }
+
+    private void applyEffect(Player player, String effectStr) {
+        String[] parts = effectStr.split(":");
+        PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
+        int amp = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+        if (type != null) {
+            player.addPotionEffect(new PotionEffect(type, Integer.MAX_VALUE, amp, true, false));
+        }
+    }
+
+    public static class GuideEntry {
+        public String id;
+        public List<String> mobs;
+        public int requiredKills;
+        public double unlockChance;
+        public String reward;
+        public String effect;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\ItemManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+/** 銝剜?嚗摰儔?拙?霈?蝡?items.yml嚗蒂靽? Lore 霅璅???*/
+public class ItemManager {
+    private final IndieRPG plugin;
+    private final Map<String, CustomItem> items = new HashMap<>();
+
+    public ItemManager(IndieRPG plugin) { this.plugin = plugin; loadItems(); }
+
+    public void loadItems() {
+        items.clear();
+        ConfigurationSection section = plugin.getConfigManager().get("items").getConfigurationSection("items");
+        if (section == null) return;
+        for (String key : section.getKeys(false)) {
+            String path = key;
+            CustomItem item = new CustomItem();
+            item.id = section.getString(path + ".id", key).toLowerCase(Locale.ENGLISH);
+            item.material = Material.matchMaterial(section.getString(path + ".material", "PAPER"));
+            item.displayMaterial = Material.matchMaterial(section.getString(path + ".display-material", section.getString(path + ".material", "PAPER")));
+            item.displayName = ChatColor.translateAlternateColorCodes('&', section.getString(path + ".display-name", key));
+            item.namespace = section.getString(path + ".namespace", "indierpg:item");
+            item.lore = new ArrayList<>();
+            for (String line : section.getStringList(path + ".lore")) item.lore.add(ChatColor.translateAlternateColorCodes('&', line));
+            items.put(item.id, item);
+        }
+        plugin.getLogger().info("撌脰???" + items.size() + " ?摰儔?拙?");
+    }
+
+    public ItemStack getItem(String id) {
+        CustomItem custom = items.get(id.toLowerCase(Locale.ENGLISH));
+        if (custom == null) return null;
+        ItemStack item = new ItemStack(custom.material == null ? Material.PAPER : custom.material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(custom.displayName);
+            if (!custom.lore.isEmpty()) meta.setLore(custom.lore);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    public List<String> getItemIds() { return new ArrayList<>(items.keySet()); }
+
+    public static class CustomItem {
+        public String id;
+        public String namespace;
+        public Material material;
+        public Material displayMaterial;
+        public String displayName;
+        public List<String> lore;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\JewelryGrowthManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+/** 霈???ˇ??????詨潘?-1 蝑?銝?隞?”?⊿???*/
+public class JewelryGrowthManager {
+    private final IndieRPG plugin;
+    private final Map<String, Map<Long, Map<String, Double>>> levels = new HashMap<>();
+    public JewelryGrowthManager(IndieRPG plugin) { this.plugin = plugin; reload(); }
+    public void reload() {
+        levels.clear();
+        FileConfiguration c = plugin.getConfigManager().get("jewelry");
+        ConfigurationSection root = c.getConfigurationSection("jewelry.definitions");
+        if (root == null) return;
+        for (String id : root.getKeys(false)) {
+            ConfigurationSection section = root.getConfigurationSection(id + ".growth.per-level");
+            if (section == null) continue;
+            Map<Long, Map<String, Double>> values = new HashMap<>();
+            for (String level : section.getKeys(false)) {
+                ConfigurationSection attributes = section.getConfigurationSection(level);
+                if (attributes == null) continue;
+                Map<String, Double> increments = new HashMap<>();
+                for (String key : attributes.getKeys(false)) increments.put(key, attributes.getDouble(key));
+                try { values.put(Long.parseLong(level), increments); } catch (NumberFormatException ignored) { }
+            }
+            levels.put(id.toLowerCase(), values);
+        }
+    }
+    public Map<String, Double> getIncrement(String id, long level) {
+        Map<Long, Map<String, Double>> values = levels.get(id.toLowerCase());
+        if (values == null) return Collections.emptyMap();
+        Map<String, Double> exact = values.get(level);
+        if (exact != null) return Collections.unmodifiableMap(exact);
+        return Collections.emptyMap();
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\JewelryManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.*;
+
+public class JewelryManager {
+
+    private final IndieRPG plugin;
+    private final Map<String, JewelrySet> sets = new HashMap<>();
+
+    public JewelryManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadSets();
+    }
+
+    public void loadSets() {
+        sets.clear();
+        if (plugin.getConfig().contains("jewelry.sets")) {
+            for (String key : plugin.getConfig().getConfigurationSection("jewelry.sets").getKeys(false)) {
+                String path = "jewelry.sets." + key;
+                JewelrySet set = new JewelrySet();
+                set.id = key;
+                set.jewelry = plugin.getConfig().getStringList(path + ".jewelry");
+                set.effect = plugin.getConfig().getString(path + ".effect", "");
+                sets.put(key, set);
+            }
+        }
+        plugin.getLogger().info("Loaded " + sets.size() + " jewelry sets");
+    }
+
+    public void openJewelryGUI(Player player) {
+        int pages = plugin.getConfig().getInt("jewelry.pages", 3);
+        Inventory inv = Bukkit.createInventory(null, 27,
+                ChatColor.translateAlternateColorCodes('&', "&b&lJewelry Slots &7[" + pages + " pages]"));
+
+        int slotCount = plugin.getConfig().getConfigurationSection("jewelry.slots").getKeys(false).size();
+        for (int i = 0; i < slotCount && i < 27; i++) {
+            String perm = plugin.getConfig().getString("jewelry.slots." + i + ".permission", "");
+            ItemStack icon;
+            if (perm.isEmpty() || player.hasPermission(perm)) {
+                icon = new ItemStack(Material.EMERALD);
+                ItemMeta meta = icon.getItemMeta();
+                meta.setDisplayName(ChatColor.GREEN + "Slot " + (i + 1) + " (Unlocked)");
+                icon.setItemMeta(meta);
+            } else {
+                icon = new ItemStack(Material.IRON_FENCE);
+                ItemMeta meta = icon.getItemMeta();
+                meta.setDisplayName(ChatColor.RED + "Slot " + (i + 1) + " (Locked)");
+                meta.setLore(Collections.singletonList(ChatColor.GRAY + "Requires: " + perm));
+                icon.setItemMeta(meta);
+            }
+            inv.setItem(i, icon);
+        }
+
+        player.openInventory(inv);
+    }
+
+    public String detectJewelryFromLore(List<String> lores) {
+        for (String lore : lores) {
+            String stripped = ChatColor.stripColor(lore).trim().toLowerCase();
+            if (stripped.startsWith("jewelry-id:")) {
+                return stripped.substring("jewelry-id:".length()).trim();
+            }
+        }
+        return null;
+    }
+
+    public void applySetBonuses(Player player, Set<String> equippedJewelry) {
+        for (JewelrySet set : sets.values()) {
+            if (equippedJewelry.containsAll(set.jewelry)) {
+                if (!set.effect.isEmpty()) {
+                    String[] parts = set.effect.split(":");
+                    PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
+                    int amp = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+                    if (type != null) {
+                        player.addPotionEffect(new PotionEffect(type, Integer.MAX_VALUE, amp, true, false));
+                    }
+                }
+            }
+        }
+    }
+
+    public static class JewelrySet {
+        public String id;
+        public List<String> jewelry;
+        public String effect;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\MonsterCardManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.*;
+
+public class MonsterCardManager {
+
+    private final IndieRPG plugin;
+    private final Map<String, CardDef> cards = new HashMap<>();
+    private final Map<String, CardSet> sets = new HashMap<>();
+
+    public MonsterCardManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadCards();
+    }
+
+    public void loadCards() {
+        cards.clear();
+        sets.clear();
+
+        if (plugin.getConfig().contains("cards.definitions")) {
+            for (String key : plugin.getConfig().getConfigurationSection("cards.definitions").getKeys(false)) {
+                String path = "cards.definitions." + key;
+                CardDef card = new CardDef();
+                card.id = key;
+                card.effect = plugin.getConfig().getString(path + ".effect", "");
+                cards.put(key, card);
+            }
+        }
+
+        if (plugin.getConfig().contains("cards.sets")) {
+            for (String key : plugin.getConfig().getConfigurationSection("cards.sets").getKeys(false)) {
+                String path = "cards.sets." + key;
+                CardSet set = new CardSet();
+                set.id = key;
+                set.cards = plugin.getConfig().getStringList(path + ".cards");
+                set.effect = plugin.getConfig().getString(path + ".effect", "");
+                sets.put(key, set);
+            }
+        }
+
+        plugin.getLogger().info("Loaded " + cards.size() + " monster cards, " + sets.size() + " card sets");
+    }
+
+    public String detectCardFromLore(List<String> lores) {
+        for (String lore : lores) {
+            String stripped = ChatColor.stripColor(lore).trim().toLowerCase();
+            if (stripped.startsWith("card-id:")) {
+                return stripped.substring("card-id:".length()).trim();
+            }
+        }
+        return null;
+    }
+
+    public void onMonsterKill(Player player, LivingEntity entity) {
+        String mobType = entity.getType().name();
+        for (CardDef card : cards.values()) {
+            if (card.id.toLowerCase().contains(mobType.toLowerCase()) ||
+                mobType.toLowerCase().contains(card.id.toLowerCase())) {
+                player.sendMessage(ChatColor.DARK_PURPLE + "[Cards] " + ChatColor.RESET +
+                        "Obtained card: " + card.id + "!");
+            }
+        }
+    }
+
+    public void applyCardEffects(Player player, Set<String> ownedCards) {
+        for (String cardId : ownedCards) {
+            CardDef card = cards.get(cardId);
+            if (card != null && !card.effect.isEmpty()) {
+                applyEffect(player, card.effect, 0);
+            }
+        }
+        for (CardSet set : sets.values()) {
+            if (ownedCards.containsAll(set.cards)) {
+                if (!set.effect.isEmpty()) {
+                    applyEffect(player, set.effect, 0);
+                }
+            }
+        }
+    }
+
+    private void applyEffect(Player player, String effectStr, int amplifier) {
+        String[] parts = effectStr.split(":");
+        PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
+        int amp = parts.length > 1 ? Integer.parseInt(parts[1]) : amplifier;
+        if (type != null) {
+            player.addPotionEffect(new PotionEffect(type, Integer.MAX_VALUE, amp, true, false));
+        }
+    }
+
+    public static class CardDef {
+        public String id;
+        public String effect;
+    }
+
+    public static class CardSet {
+        public String id;
+        public List<String> cards;
+        public String effect;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\PlayerDataManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * ?拙振鞈?靽?嚗?撟?迂?予鞈艾蝺??ˇ???瑯??亦??萇????? */
+public class PlayerDataManager {
+    private final IndieRPG plugin;
+    private final Map<UUID, PlayerData> cache = new HashMap<>();
+    private final File folder;
+
+    public PlayerDataManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        this.folder = new File(plugin.getDataFolder(), "playerdata");
+        if (!folder.exists()) folder.mkdirs();
+    }
+
+    public PlayerData getPlayerData(UUID uuid) {
+        if (!cache.containsKey(uuid)) {
+            cache.put(uuid, load(uuid));
+        }
+        return cache.get(uuid);
+    }
+
+    public PlayerData getPlayerData(Player player) {
+        return getPlayerData(player.getUniqueId());
+    }
+
+    private PlayerData load(UUID uuid) {
+        PlayerData data = new PlayerData(uuid);
+        File file = new File(folder, uuid + ".yml");
+        if (!file.exists()) return data;
+
+        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+        data.talentPoints = config.getInt("talent-points", 0);
+        data.battlePassLevel = config.getInt("battlepass-level", 0);
+        data.battlePassXP = config.getInt("battlepass-xp", 0);
+        data.rank = config.getString("rank", "default");
+        data.taskKills = config.getInt("task-kills", 0);
+        data.taskActive = config.getBoolean("task-active", false);
+        data.gold = config.getInt("gold", plugin.getConfig().getInt("economy.starting-gold", 0));
+        data.totalOnlineMinutes = config.getLong("online.total-minutes", 0L);
+        data.lastDailyClaim = config.getLong("daily.last-claim", 0L);
+
+        if (config.isConfigurationSection("talents")) {
+            for (String key : config.getConfigurationSection("talents").getKeys(false)) {
+                data.talentLevels.put(key, config.getInt("talents." + key, 0));
+            }
+        }
+
+        if (config.isConfigurationSection("jewelry")) {
+            for (String key : config.getConfigurationSection("jewelry").getKeys(false)) {
+                data.jewelryLevels.put(key, config.getLong("jewelry." + key + ".level", 0L));
+                data.jewelryOnlineMinutes.put(key, config.getLong("jewelry." + key + ".online-minutes", 0L));
+                data.jewelryRealSeconds.put(key, config.getLong("jewelry." + key + ".real-seconds", 0L));
+                data.jewelryGrowthPoints.put(key, config.getDouble("jewelry." + key + ".growth-points", 0D));
+            }
+        }
+
+        return data;
+    }
+
+    public void saveData(UUID uuid) {
+        PlayerData data = cache.get(uuid);
+        if (data == null) return;
+
+        FileConfiguration config = new YamlConfiguration();
+        config.set("talent-points", data.talentPoints);
+        config.set("battlepass-level", data.battlePassLevel);
+        config.set("battlepass-xp", data.battlePassXP);
+        config.set("rank", data.rank);
+        config.set("task-kills", data.taskKills);
+        config.set("task-active", data.taskActive);
+        config.set("gold", data.gold);
+        config.set("online.total-minutes", data.totalOnlineMinutes);
+        config.set("daily.last-claim", data.lastDailyClaim);
+
+        for (Map.Entry<String, Integer> e : data.talentLevels.entrySet()) {
+            config.set("talents." + e.getKey(), e.getValue());
+        }
+
+        for (Map.Entry<String, Long> e : data.jewelryLevels.entrySet()) {
+            String key = e.getKey();
+            config.set("jewelry." + key + ".level", e.getValue());
+            config.set("jewelry." + key + ".online-minutes", data.jewelryOnlineMinutes.getOrDefault(key, 0L));
+            config.set("jewelry." + key + ".real-seconds", data.jewelryRealSeconds.getOrDefault(key, 0L));
+            config.set("jewelry." + key + ".growth-points", data.jewelryGrowthPoints.getOrDefault(key, 0D));
+        }
+
+        try {
+            config.save(new File(folder, uuid + ".yml"));
+        } catch (IOException e) {
+            plugin.getLogger().warning("?⊥?靽??拙振鞈?嚗? + uuid + " ??嚗? + e.getMessage());
+        }
+    }
+
+    public void saveAll() {
+        for (UUID uuid : cache.keySet()) {
+            saveData(uuid);
+        }
+    }
+
+    public void addOnlineMinute(UUID uuid) {
+        PlayerData data = getPlayerData(uuid);
+        data.totalOnlineMinutes += 1L;
+    }
+
+    public static class PlayerData {
+        public final UUID uuid;
+        public int talentPoints;
+        public int battlePassLevel;
+        public int battlePassXP;
+        public int taskKills;
+        public int gold;
+        public String rank;
+        public boolean taskActive;
+        public long totalOnlineMinutes;
+        public long lastDailyClaim;
+
+        public Map<String, Integer> talentLevels = new HashMap<>();
+        public Map<String, Long> jewelryLevels = new HashMap<>();
+        public Map<String, Long> jewelryOnlineMinutes = new HashMap<>();
+        public Map<String, Long> jewelryRealSeconds = new HashMap<>();
+        public Map<String, Double> jewelryGrowthPoints = new HashMap<>();
+
+        public PlayerData(UUID uuid) {
+            this.uuid = uuid;
+            this.rank = "default";
+        }
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\RankManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class RankManager {
+
+    private final IndieRPG plugin;
+    private final Map<String, RankData> ranks = new HashMap<>();
+
+    public RankManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadRanks();
+    }
+
+    public void loadRanks() {
+        ranks.clear();
+        if (plugin.getConfig().contains("rank.ranks")) {
+            for (String key : plugin.getConfig().getConfigurationSection("rank.ranks").getKeys(false)) {
+                String path = "rank.ranks." + key;
+                RankData rank = new RankData();
+                rank.id = key;
+                rank.display = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString(path + ".display", key));
+                rank.chatPrefix = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString(path + ".chat-prefix", ""));
+                ranks.put(key, rank);
+            }
+        }
+        plugin.getLogger().info("Loaded " + ranks.size() + " ranks");
+    }
+
+    public String detectRankFromName(String itemName) {
+        String strippedName = ChatColor.stripColor(itemName).toLowerCase();
+        if (plugin.getConfig().contains("rank.items")) {
+            for (String matchItem : plugin.getConfig().getConfigurationSection("rank.items").getKeys(false)) {
+                String rankId = plugin.getConfig().getString("rank.items." + matchItem);
+                String strippedMatch = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', matchItem)).toLowerCase();
+                if (strippedName.contains(strippedMatch)) {
+                    return rankId;
+                }
+            }
+        }
+        return null;
+    }
+
+    public String detectRankFromLore(List<String> lores) {
+        for (String lore : lores) {
+            String rankId = detectRankFromName(lore);
+            if (rankId != null) return rankId;
+        }
+        return null;
+    }
+
+    public void setRank(Player player, String rankId) {
+        RankData rank = ranks.get(rankId);
+        if (rank == null) {
+            player.sendMessage(ChatColor.RED + "Unknown rank: " + rankId);
+            return;
+        }
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.rank = rankId;
+        player.sendMessage(ChatColor.GOLD + "[Rank] " + ChatColor.RESET + "Rank: " + rank.display);
+    }
+
+    public String getRankDisplay(String rankId) {
+        RankData rank = ranks.get(rankId);
+        return rank != null ? rank.display : rankId;
+    }
+
+    public static class RankData {
+        public String id;
+        public String display;
+        public String chatPrefix;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\ShopManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+/** 1.12.2 ?澆捆?陛?桅?撟??摨?*/
+public class ShopManager {
+    private final IndieRPG plugin;
+    private final Map<String, ShopItem> items = new LinkedHashMap<>();
+
+    public ShopManager(IndieRPG plugin) { this.plugin = plugin; loadShop(); }
+
+    public void loadShop() {
+        items.clear();
+        ConfigurationSection root = plugin.getConfig().getConfigurationSection("shop.items");
+        if (root == null) return;
+        for (String id : root.getKeys(false)) {
+            ConfigurationSection section = root.getConfigurationSection(id);
+            if (section == null) continue;
+            ShopItem item = new ShopItem();
+            item.id = id;
+            item.price = Math.max(0, section.getInt("price", 0));
+            item.itemId = section.getString("item", id);
+            item.material = Material.matchMaterial(section.getString("material", "PAPER"));
+            item.name = ChatColor.translateAlternateColorCodes('&', section.getString("display-name", id));
+            items.put(id.toLowerCase(), item);
+        }
+        plugin.getLogger().info("撌脰???" + items.size() + " ??摨???);
+    }
+
+    public Inventory openShop(Player player) {
+        Inventory inventory = org.bukkit.Bukkit.createInventory(null, 54, ChatColor.GOLD + "LDAPI ?馳??");
+        int slot = 0;
+        for (ShopItem shopItem : items.values()) {
+            ItemStack icon = new ItemStack(shopItem.material == null ? Material.PAPER : shopItem.material);
+            ItemMeta meta = icon.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(shopItem.name);
+                List<String> lore = new ArrayList<>();
+                lore.add(ChatColor.GRAY + "?寞嚗? + shopItem.price + " ?馳");
+                lore.add(ChatColor.YELLOW + "暺?鞈潸眺");
+                meta.setLore(lore);
+                icon.setItemMeta(meta);
+            }
+            inventory.setItem(slot++, icon);
+            if (slot >= inventory.getSize()) break;
+        }
+        player.openInventory(inventory);
+        return inventory;
+    }
+
+    public boolean buy(Player player, String id) {
+        ShopItem item = items.get(id.toLowerCase());
+        if (item == null) return false;
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        if (data.gold < item.price) { player.sendMessage(ChatColor.RED + "?馳銝雲??); return false; }
+        ItemStack result = plugin.getItemManager().getItem(item.itemId);
+        if (result == null) result = new ItemStack(item.material == null ? Material.PAPER : item.material);
+        data.gold -= item.price;
+        player.getInventory().addItem(result);
+        player.sendMessage(ChatColor.GREEN + "鞈潸眺??嚗? + item.name);
+        return true;
+    }
+
+    public Map<String, ShopItem> getItems() { return items; }
+    public static class ShopItem { public String id, itemId, name; public int price; public Material material; }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\SoulBeadManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import java.util.*;
+
+public class SoulBeadManager {
+
+    private final IndieRPG plugin;
+    private final Map<String, BeadDef> beads = new HashMap<>();
+    private final Map<String, BeadSet> sets = new HashMap<>();
+
+    public SoulBeadManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadBeads();
+    }
+
+    public void loadBeads() {
+        beads.clear();
+        sets.clear();
+
+        if (plugin.getConfig().contains("soul-beads.definitions")) {
+            for (String key : plugin.getConfig().getConfigurationSection("soul-beads.definitions").getKeys(false)) {
+                String path = "soul-beads.definitions." + key;
+                BeadDef bead = new BeadDef();
+                bead.id = key;
+                bead.max = plugin.getConfig().getInt(path + ".max", 1);
+                bead.permission = plugin.getConfig().getString(path + ".permission", "");
+                bead.effect = plugin.getConfig().getString(path + ".effect", "");
+                beads.put(key, bead);
+            }
+        }
+
+        if (plugin.getConfig().contains("soul-beads.sets")) {
+            for (String key : plugin.getConfig().getConfigurationSection("soul-beads.sets").getKeys(false)) {
+                String path = "soul-beads.sets." + key;
+                BeadSet set = new BeadSet();
+                set.id = key;
+                set.beads = plugin.getConfig().getStringList(path + ".beads");
+                set.effect = plugin.getConfig().getString(path + ".effect", "");
+                sets.put(key, set);
+            }
+        }
+
+        plugin.getLogger().info("Loaded " + beads.size() + " soul beads, " + sets.size() + " bead sets");
+    }
+
+    public String detectBeadFromLore(List<String> lores) {
+        for (String lore : lores) {
+            String stripped = ChatColor.stripColor(lore).trim().toLowerCase();
+            if (stripped.startsWith("soul-bead-id:")) {
+                return stripped.substring("soul-bead-id:".length()).trim();
+            }
+        }
+        return null;
+    }
+
+    public void openBeadGUI(Player player) {
+        int pageSize = plugin.getConfig().getInt("soul-beads.page-size", 36);
+        Inventory inv = Bukkit.createInventory(null, 45,
+                ChatColor.translateAlternateColorCodes('&', "&d&lSoul Beads &7[Collect & Equip]"));
+
+        int slot = 0;
+        for (BeadDef bead : beads.values()) {
+            if (slot >= pageSize) break;
+
+            boolean unlocked = bead.permission.isEmpty() || player.hasPermission(bead.permission);
+
+            Material mat = unlocked ? Material.NETHER_STAR : Material.GHAST_TEAR;
+            ItemStack item = new ItemStack(mat);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName(ChatColor.AQUA + bead.id);
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Max: " + bead.max);
+            lore.add(ChatColor.GRAY + "Effect: " + bead.effect);
+            if (!unlocked) {
+                lore.add("");
+                lore.add(ChatColor.RED + "Locked: " + bead.permission);
+            } else {
+                lore.add("");
+                lore.add(ChatColor.GREEN + "Click to equip!");
+            }
+            meta.setLore(lore);
+            item.setItemMeta(meta);
+
+            inv.setItem(slot, item);
+            slot++;
+        }
+
+        player.openInventory(inv);
+    }
+
+    public void applyBeadEffects(Player player, Set<String> equippedBeads) {
+        for (String beadId : equippedBeads) {
+            BeadDef bead = beads.get(beadId);
+            if (bead != null && !bead.effect.isEmpty()) {
+                applyEffect(player, bead.effect, 0);
+            }
+        }
+        for (BeadSet set : sets.values()) {
+            if (equippedBeads.containsAll(set.beads)) {
+                if (!set.effect.isEmpty()) {
+                    applyEffect(player, set.effect, 0);
+                    player.sendMessage(ChatColor.LIGHT_PURPLE + "[SoulBeads] " + ChatColor.RESET +
+                            "Set bonus active: " + set.id + "!");
+                }
+            }
+        }
+    }
+
+    private void applyEffect(Player player, String effectStr, int amplifier) {
+        String[] parts = effectStr.split(":");
+        PotionEffectType type = PotionEffectType.getByName(parts[0].toUpperCase());
+        int amp = parts.length > 1 ? Integer.parseInt(parts[1]) : amplifier;
+        if (type != null) {
+            player.addPotionEffect(new PotionEffect(type, Integer.MAX_VALUE, amp, true, false));
+        }
+    }
+
+    public static class BeadDef {
+        public String id;
+        public int max;
+        public String permission;
+        public String effect;
+    }
+
+    public static class BeadSet {
+        public String id;
+        public List<String> beads;
+        public String effect;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\SoulStorageManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
+
+public class SoulStorageManager {
+
+    private final IndieRPG plugin;
+
+    public SoulStorageManager(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    public void openSoulStorage(Player player, int page) {
+        int slotsPerPage = plugin.getConfig().getInt("storage.slots-per-page", 45);
+        int maxPages = getMaxPages(player);
+
+        page = Math.max(0, Math.min(page, maxPages - 1));
+        Inventory inv = Bukkit.createInventory(null, 54,
+                ChatColor.translateAlternateColorCodes('&',
+                        "&5&lSoul Storage &7[Page " + (page + 1) + "/" + maxPages + "]"));
+
+        ItemStack prev = new ItemStack(Material.WOOD_BUTTON);
+        ItemMeta prevMeta = prev.getItemMeta();
+        prevMeta.setDisplayName(ChatColor.GREEN + "Previous Page");
+        prev.setItemMeta(prevMeta);
+        inv.setItem(45, prev);
+
+        ItemStack next = new ItemStack(Material.IRON_DOOR);
+        ItemMeta nextMeta = next.getItemMeta();
+        nextMeta.setDisplayName(ChatColor.GREEN + "Next Page");
+        next.setItemMeta(nextMeta);
+        inv.setItem(53, next);
+
+        player.openInventory(inv);
+    }
+
+    public int getMaxPages(Player player) {
+        if (!plugin.getConfig().contains("storage.levels")) return 1;
+
+        int maxPages = 1;
+        for (String key : plugin.getConfig().getConfigurationSection("storage.levels").getKeys(false)) {
+            String path = "storage.levels." + key;
+            int pages = plugin.getConfig().getInt(path + ".pages", 1);
+            String condition = plugin.getConfig().getString(path + ".condition", "NONE");
+            String value = plugin.getConfig().getString(path + ".value", "");
+
+            if (checkCondition(player, condition, value)) {
+                maxPages = Math.max(maxPages, pages);
+            }
+        }
+        return maxPages;
+    }
+
+    private boolean checkCondition(Player player, String condition, String value) {
+        if (condition.equals("NONE")) return true;
+        if (condition.equals("PERMISSION")) return player.hasPermission(value);
+        if (condition.equals("XP_LEVEL")) return player.getLevel() >= Integer.parseInt(value);
+        if (condition.equals("ITEM")) {
+            String[] parts = value.split(":");
+            Material mat = Material.matchMaterial(parts[0]);
+            int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
+            return player.getInventory().contains(mat, amount);
+        }
+        return false;
+    }
+
+    public boolean matchesLore(List<String> itemLores) {
+        List<String> triggers = plugin.getConfig().getStringList("storage.trigger-items");
+        for (String lore : itemLores) {
+            String strippedLore = ChatColor.stripColor(lore).trim().toLowerCase();
+            for (String trigger : triggers) {
+                String strippedTrigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', trigger)).trim().toLowerCase();
+                if (strippedLore.contains(strippedTrigger)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\SpaceRingManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+
+import java.util.List;
+
+/** 銝剜?嚗征???蝙?函蝡?spaces.yml ?征??蝔梧??身摰?靽??澆捆??*/
+public class SpaceRingManager {
+    private final IndieRPG plugin;
+    public SpaceRingManager(IndieRPG plugin) { this.plugin = plugin; }
+
+    public void openSpaceRing(Player player, String matchedName) {
+        List<Integer> sizes = plugin.getConfig().getIntegerList("spacering.sizes");
+        int tier = 0;
+        List<String> triggers = plugin.getConfig().getStringList("spacering.trigger-items");
+        String input = ChatColor.stripColor(matchedName).toLowerCase();
+        for (int i = 0; i < triggers.size(); i++) {
+            String trigger = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', triggers.get(i))).toLowerCase();
+            if (input.contains(trigger)) { tier = i; break; }
+        }
+        int size = tier < sizes.size() ? sizes.get(tier) : 27;
+        openRing(player, size, tier);
+    }
+
+    public boolean matchesLore(List<String> lores) {
+        for (String lore : lores) {
+            String line = ChatColor.stripColor(lore).toLowerCase();
+            for (String trigger : plugin.getConfig().getStringList("spacering.trigger-items")) {
+                if (line.contains(ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', trigger)).toLowerCase())) return true;
+            }
+        }
+        return false;
+    }
+
+    public void openRing(Player player, int size, int tier) {
+        size = Math.max(9, Math.min(size, 54));
+        String title = plugin.getConfigManager().get("spaces").getString("spaces.main.display-name", "&a銝餌征??);
+        Inventory inventory = Bukkit.createInventory(null, size, ChatColor.translateAlternateColorCodes('&', title));
+        player.openInventory(inventory);
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("general.prefix", "&d[IndieRPG] &r") + "&7撌脤??征????));
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\TalentManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class TalentManager {
+
+    private final IndieRPG plugin;
+    private final Map<String, TalentTree> trees = new HashMap<>();
+
+    public TalentManager(IndieRPG plugin) {
+        this.plugin = plugin;
+        loadTrees();
+    }
+
+    public void loadTrees() {
+        trees.clear();
+        if (plugin.getConfig().contains("talent.trees")) {
+            for (String key : plugin.getConfig().getConfigurationSection("talent.trees").getKeys(false)) {
+                String path = "talent.trees." + key;
+                TalentTree tree = new TalentTree();
+                tree.id = key;
+                tree.displayName = ChatColor.translateAlternateColorCodes('&',
+                        plugin.getConfig().getString(path + ".display-name", key));
+                tree.icon = Material.matchMaterial(plugin.getConfig().getString(path + ".icon", "DIAMOND_SWORD"));
+                tree.maxLevel = plugin.getConfig().getInt(path + ".max-level", 10);
+                tree.pointsPerLevel = plugin.getConfig().getInt(path + ".points-per-level", 1);
+                tree.slot = plugin.getConfig().getInt(path + ".slot", 11);
+                tree.lore = plugin.getConfig().getStringList(path + ".lore");
+                trees.put(key, tree);
+            }
+        }
+        plugin.getLogger().info("Loaded " + trees.size() + " talent trees");
+    }
+
+    public void openTalentMenu(Player player) {
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        int guiSize = plugin.getConfig().getInt("talent.gui-size", 45);
+        String title = plugin.getConfig().getString("talent.menu-title", "&d&lTalent &7[Points: {points}]");
+        title = title.replace("{points}", String.valueOf(data.talentPoints));
+        title = ChatColor.translateAlternateColorCodes('&', title);
+
+        Inventory inv = Bukkit.createInventory(null, guiSize, title);
+
+        for (TalentTree tree : trees.values()) {
+            int currentLevel = data.talentLevels.getOrDefault(tree.id, 0);
+            inv.setItem(tree.slot, createTalentItem(tree, currentLevel));
+        }
+
+        int resetSlot = plugin.getConfig().getInt("talent.reset-slot", 40);
+        ItemStack resetItem = new ItemStack(Material.TNT);
+        ItemMeta resetMeta = resetItem.getItemMeta();
+        resetMeta.setDisplayName(ChatColor.YELLOW + "Reset Talents");
+        List<String> resetLore = new ArrayList<>();
+        resetLore.add(ChatColor.GRAY + "Refund " + plugin.getConfig().getInt("talent.reset-refund-percent", 80) + "% of points");
+        resetMeta.setLore(resetLore);
+        resetItem.setItemMeta(resetMeta);
+        inv.setItem(resetSlot, resetItem);
+
+        player.openInventory(inv);
+    }
+
+    private ItemStack createTalentItem(TalentTree tree, int currentLevel) {
+        ItemStack item = new ItemStack(tree.icon != null ? tree.icon : Material.DIAMOND_SWORD);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(tree.displayName);
+        List<String> lore = new ArrayList<>();
+        for (String line : tree.lore) {
+            line = line.replace("{level}", String.valueOf(currentLevel));
+            line = line.replace("{max}", String.valueOf(tree.maxLevel));
+            lore.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+        meta.setLore(lore);
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    public void addTalentPoint(Player player, int amount) {
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.talentPoints += amount;
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&',
+                plugin.getConfig().getString("general.prefix", "&d[IndieRPG] &r") + "&7+" + amount + " talent points!"));
+    }
+
+    public boolean matchesLore(List<String> itemLores) {
+        for (String lore : itemLores) {
+            String stripped = ChatColor.stripColor(lore).trim().toLowerCase();
+            if (stripped.contains("talent point") || stripped.contains("憭抵???)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static class TalentTree {
+        public String id;
+        public String displayName;
+        public Material icon;
+        public int maxLevel;
+        public int pointsPerLevel;
+        public int slot;
+        public List<String> lore;
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\managers\TaskManager.java =====
+
+package com.indie.rpg.managers;
+
+import com.indie.rpg.IndieRPG;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+public class TaskManager {
+
+    private final IndieRPG plugin;
+
+    public TaskManager(IndieRPG plugin) {
+        this.plugin = plugin;
+    }
+
+    public void onEntityKill(Player player, LivingEntity entity) {
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        if (!data.taskActive) return;
+
+        int required = plugin.getConfig().getInt("task.required-kills", 15);
+        data.taskKills++;
+
+        String progressMsg = plugin.getConfig().getString("task.progress-message", "&a[Task] &7Progress: {kills}/{count}");
+        progressMsg = progressMsg.replace("{kills}", String.valueOf(data.taskKills))
+                                 .replace("{count}", String.valueOf(required));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', progressMsg));
+
+        if (data.taskKills >= required) {
+            int gold = plugin.getConfig().getInt("task.rewards.gold", 100);
+            int points = plugin.getConfig().getInt("task.rewards.talent-points", 5);
+            int xp = plugin.getConfig().getInt("task.rewards.battlepass-xp", 50);
+
+            data.gold += gold;
+            data.taskKills = 0;
+            data.taskActive = false;
+            plugin.getTalentManager().addTalentPoint(player, points);
+            plugin.getBattlePassManager().addXP(player, xp);
+
+            String completeMsg = plugin.getConfig().getString("task.complete-message",
+                    "&6[Task] &eComplete! +{gold} Gold, +{points} Talent Points");
+            completeMsg = completeMsg.replace("{gold}", String.valueOf(gold))
+                                     .replace("{points}", String.valueOf(points));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', completeMsg));
+        }
+    }
+
+    public void startTask(Player player) {
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        if (data.taskActive) {
+            player.sendMessage(ChatColor.RED + "You already have an active task!");
+            return;
+        }
+        data.taskActive = true;
+        data.taskKills = 0;
+
+        int required = plugin.getConfig().getInt("task.required-kills", 15);
+        String startMsg = plugin.getConfig().getString("task.start-message", "&a[Task] &7Slayer task: kill {count} monsters.");
+        startMsg = startMsg.replace("{count}", String.valueOf(required));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', startMsg));
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\util\ItemLoreUtil.java =====
+
+package com.indie.rpg.util;
+
+import org.bukkit.ChatColor;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+/** Minecraft 1.12.2 ?舐??蝔梯? Lore 霅撌亙??*/
+public final class ItemLoreUtil {
+    private ItemLoreUtil() { }
+
+    public static String plain(String value) {
+        return ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', value == null ? "" : value))
+                .trim().toLowerCase(Locale.ENGLISH);
+    }
+
+    public static List<String> lore(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return Collections.emptyList();
+        ItemMeta meta = item.getItemMeta();
+        return meta == null || !meta.hasLore() || meta.getLore() == null
+                ? Collections.<String>emptyList() : new ArrayList<String>(meta.getLore());
+    }
+
+    public static String displayName(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return "";
+        ItemMeta meta = item.getItemMeta();
+        return meta != null && meta.hasDisplayName() ? meta.getDisplayName() : "";
+    }
+
+    public static String value(ItemStack item, String key) {
+        String prefix = plain(key) + ":";
+        for (String line : lore(item)) {
+            String normalized = plain(line);
+            if (normalized.startsWith(prefix)) return normalized.substring(prefix.length()).trim();
+        }
+        return null;
+    }
+
+    public static boolean hasValue(ItemStack item, String key, String expected) {
+        String actual = value(item, key);
+        return actual != null && actual.equals(plain(expected));
+    }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\java\com\indie\rpg\IndieRPG.java =====
+
+package com.indie.rpg;
+
+import com.indie.rpg.commands.CommandHandler;
+import com.indie.rpg.integrations.MythicMobsHook;
+import com.indie.rpg.listeners.InventoryListener;
+import com.indie.rpg.listeners.PlayerListener;
+import com.indie.rpg.managers.*;
+import org.bukkit.plugin.java.JavaPlugin;
+
+public class IndieRPG extends JavaPlugin {
+    private static IndieRPG instance;
+    private ConfigManager configManager;
+    private PlayerDataManager playerDataManager;
+    private ItemManager itemManager;
+    private AttributeManager attributeManager;
+    private ShopManager shopManager;
+    private DailyRewardManager dailyRewardManager;
+    private JewelryManager jewelryManager;
+    private JewelryGrowthManager jewelryGrowthManager;
+    private GrowthManager growthManager;
+    private SpaceRingManager spaceRingManager;
+    private SoulStorageManager soulStorageManager;
+    private TalentManager talentManager;
+    private TaskManager taskManager;
+    private CrateManager crateManager;
+    private RankManager rankManager;
+    private BattlePassManager battlePassManager;
+    private MonsterCardManager monsterCardManager;
+    private GuideManager guideManager;
+    private ExchangeManager exchangeManager;
+    private SoulBeadManager soulBeadManager;
+    private MythicMobsHook mythicMobsHook;
+
+    @Override public void onEnable() {
+        instance = this;
+        saveDefaultConfig();
+        configManager = new ConfigManager(this);
+        playerDataManager = new PlayerDataManager(this);
+        itemManager = new ItemManager(this);
+        attributeManager = new AttributeManager(this);
+        shopManager = new ShopManager(this);
+        dailyRewardManager = new DailyRewardManager(this);
+        jewelryGrowthManager = new JewelryGrowthManager(this);
+        growthManager = new GrowthManager(this);
+        jewelryManager = new JewelryManager(this);
+        spaceRingManager = new SpaceRingManager(this);
+        soulStorageManager = new SoulStorageManager(this);
+        talentManager = new TalentManager(this);
+        taskManager = new TaskManager(this);
+        crateManager = new CrateManager(this);
+        rankManager = new RankManager(this);
+        battlePassManager = new BattlePassManager(this);
+        monsterCardManager = new MonsterCardManager(this);
+        guideManager = new GuideManager(this);
+        exchangeManager = new ExchangeManager(this);
+        soulBeadManager = new SoulBeadManager(this);
+        mythicMobsHook = new MythicMobsHook(this);
+        mythicMobsHook.enable();
+
+        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        CommandHandler handler = new CommandHandler(this);
+        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate"})
+            if (getCommand(command) != null) getCommand(command).setExecutor(handler);
+        getServer().getScheduler().runTaskTimer(this, new Runnable() {
+            @Override public void run() {
+                for (org.bukkit.entity.Player player : getServer().getOnlinePlayers()) {
+                    playerDataManager.addOnlineMinute(player.getUniqueId());
+                    growthManager.addRealTime(player, "account", 60L);
+                }
+            }
+        }, 1200L, 1200L);
+        getLogger().info("LDAPI 1.0.0 撌脣??剁?Minecraft 1.12.2 Paper嚗?);
+    }
+
+    @Override public void onDisable() { if (playerDataManager != null) playerDataManager.saveAll(); }
+    @Override public void reloadConfig() {
+        super.reloadConfig();
+        if (configManager != null) configManager.reloadAll();
+        if (itemManager != null) itemManager.loadItems();
+        if (attributeManager != null) attributeManager.loadAttributes();
+        if (shopManager != null) shopManager.loadShop();
+        if (dailyRewardManager != null) dailyRewardManager.loadRewards();
+        if (jewelryGrowthManager != null) jewelryGrowthManager.reload();
+        if (jewelryManager != null) jewelryManager.loadSets();
+        if (talentManager != null) talentManager.loadTrees();
+        if (crateManager != null) crateManager.loadRewards();
+        if (rankManager != null) rankManager.loadRanks();
+        if (monsterCardManager != null) monsterCardManager.loadCards();
+        if (guideManager != null) guideManager.loadEntries();
+        if (soulBeadManager != null) soulBeadManager.loadBeads();
+    }
+    public static IndieRPG getInstance() { return instance; }
+    public ConfigManager getConfigManager() { return configManager; }
+    public PlayerDataManager getPlayerDataManager() { return playerDataManager; }
+    public ItemManager getItemManager() { return itemManager; }
+    public AttributeManager getAttributeManager() { return attributeManager; }
+    public ShopManager getShopManager() { return shopManager; }
+    public DailyRewardManager getDailyRewardManager() { return dailyRewardManager; }
+    public JewelryManager getJewelryManager() { return jewelryManager; }
+    public JewelryGrowthManager getJewelryGrowthManager() { return jewelryGrowthManager; }
+    public GrowthManager getGrowthManager() { return growthManager; }
+    public SpaceRingManager getSpaceRingManager() { return spaceRingManager; }
+    public SoulStorageManager getSoulStorageManager() { return soulStorageManager; }
+    public TalentManager getTalentManager() { return talentManager; }
+    public TaskManager getTaskManager() { return taskManager; }
+    public CrateManager getCrateManager() { return crateManager; }
+    public RankManager getRankManager() { return rankManager; }
+    public BattlePassManager getBattlePassManager() { return battlePassManager; }
+    public MonsterCardManager getMonsterCardManager() { return monsterCardManager; }
+    public GuideManager getGuideManager() { return guideManager; }
+    public ExchangeManager getExchangeManager() { return exchangeManager; }
+    public SoulBeadManager getSoulBeadManager() { return soulBeadManager; }
+    public MythicMobsHook getMythicMobsHook() { return mythicMobsHook; }
+}
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\attributes.yml =====
+
+attributes:
+  # default ?臬?憪潘?min/max ?舀?????  attack:
+    display-name: "&c?餅???
+    default: 0
+    min: 0
+    max: 1000000
+  defense:
+    display-name: "&9?脩戌??
+    default: 0
+    min: 0
+    max: 1000000
+  health:
+    display-name: "&a???
+    default: 20
+    min: 0
+    max: 1000000
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\commands.yml =====
+
+commands:
+  main: ld
+  aliases: [ld]
+  messages:
+    no-permission: "&c雿?????
+    reload-success: "&aLDAPI ?蔭撌脤??啗??乓?
+    unknown-item: "&c?曆??啁??{id}"
+    unknown-command: "&c?芰?誘嚗撓??/ld ?亦?撟怠??
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\dailyreward.yml =====
+
+dailyreward:
+  enabled: true
+  cooldown-hours: 24
+  message: "&e[瘥?] &7蝚?{day} 憭抬?+{gold} ?馳嚗?{xp} XP"
+  rewards:
+    day1: {gold: 100, xp: 25, item: growth_core}
+    day2: {gold: 150, xp: 30, item: ""}
+    day3: {gold: 200, xp: 50, item: growth_core}
+    day7: {gold: 1000, xp: 200, item: abyss_ring}
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\general.yml =====
+
+general:
+  # ?典?閮?韌嚗? 隞?”憿蝣潦?  prefix: "&d[LDAPI] &r"
+  # 甇???啣?撱箄降????  debug: false
+  command-prefix: ld
+  lore:
+    enabled: true
+    ignore-color: true
+    id-keys: [indierpg-id, item-id, mythic-id, namespace, jewelry-id, card-id, soul-bead-id]
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\items.yml =====
+
+items:
+  # ?芾??拙? ID 敹??臭?嚗遣霅啣雿輻撠神?望??摮?摨???  growth_core:
+    id: growth_core
+    namespace: ldapi:item
+    material: EMERALD
+    display-name: "&b??詨?"
+    lore:
+      - "&7item-id: growth_core"
+      - "&7namespace: ldapi:item"
+      - "&7?券???憌曉??"
+    amount: 1
+  abyss_ring:
+    id: abyss_ring
+    namespace: ldapi:jewelry
+    material: DIAMOND
+    display-name: "&5瘛望殿??"
+    lore:
+      - "&7jewelry-id: abyss_ring"
+      - "&7namespace: ldapi:jewelry"
+    amount: 1
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\jewelry.yml =====
+
+jewelry:
+  enabled: true
+  slots: 9
+  definitions:
+    abyss_ring:
+      id: abyss_ring
+      namespace: ldapi:jewelry
+      name: "&5瘛望殿??"
+      material: DIAMOND
+      base-attributes: {attack: 10, defense: 5}
+      growth:
+        max-level: -1
+        sources: [online-time, real-time, special-item]
+        per-level:
+          "1": {attack: 1.0, defense: 0.5}
+          "2": {attack: 1.5, defense: 0.8}
+          "3": {attack: 2.5, defense: 1.2}
+        default-per-level: {attack: 1.0, defense: 0.5}
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\mythicmobs.yml =====
+
+mythicmobs:
+  # false ???其?隞嗥?摰?雿?敶梢 LDAPI ?嗡????  enabled: true
+  api-version: "4.13.0"
+  events:
+    ldapi_boss:
+      # 敹?撠? MythicMobs ?芰 internal name??      spawn:
+        skill: LDAPI_BOSS_SPAWN
+      death:
+        chance: 1.0
+        skill: LDAPI_BOSS_DEATH
+        gold: 500
+        battlepass-xp: 50
+        item: growth_core
+        command: ""
+    mythic_zombie:
+      death:
+        chance: 0.25
+        gold: 25
+        battlepass-xp: 10
+        item: growth_core
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\shop.yml =====
+
+shop:
+  enabled: true
+  menu-title: "&6&lLDAPI ?? &7[?馳嚗gold}]"
+  items:
+    growth_core:
+      price: 80
+      material: EMERALD
+      display-name: "&b??詨?"
+      item: growth_core
+      slot: 11
+    abyss_ring:
+      price: 300
+      material: DIAMOND
+      display-name: "&5瘛望殿??"
+      item: abyss_ring
+      slot: 15
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\spaces.yml =====
+
+spaces:
+  enabled: true
+  default-space: basic
+  definitions:
+    basic:
+      id: basic
+      display-name: "&a?箇?蝛粹?"
+      size: 27
+      permission: ""
+    advanced:
+      id: advanced
+      display-name: "&9?脤?蝛粹?"
+      size: 54
+      permission: ldapi.space.advanced
+  trigger-items:
+    - "item-id: space_ring_basic"
+    - "item-id: space_ring_advanced"
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config\tests.yml =====
+
+tests:
+  enabled: true
+  required-files: [general.yml, items.yml, attributes.yml, jewelry.yml, spaces.yml, commands.yml, shop.yml, dailyreward.yml, mythicmobs.yml]
+  verbose: false
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\config.yml =====
+
+# ============================================
+# IndieRPG Configuration v4.0 - Full RPG Suite
+# ============================================
+
+general:
+  prefix: "&d[IndieRPG] &r"
+  debug: false
+
+# ---------- Space Ring ----------
+spacering:
+  trigger-items:
+    - "&aBasic Space Ring"
+    - "&9Advanced Space Ring"
+    - "&6Supreme Space Ring"
+    - "&dLegendary Space Ring"
+  sizes: [9, 27, 54, 54]
+  save-contents: true
+
+# ---------- Soul Storage ----------
+soulstorage:
+  enabled: true
+  trigger-items: ["&5Soul Storage Orb", "&dSoul Pearl"]
+  size: -1
+  rows-per-page: 6
+
+# ---------- Talents ----------
+talent:
+  enabled: true
+  menu-title: "&d&lTalent System &7[Points: {points}]"
+  gui-size: 45
+  reset-slot: 40
+  reset-refund-percent: 80
+  effects:
+    attack-per-level: 0.5
+    defense-per-level: 0.5
+    health-per-level: 2
+    crit-per-level: 0.02
+    lifesteal-per-level: 0.01
+  trees:
+    attack:
+      display-name: "&c&lAttack"
+      icon: DIAMOND_SWORD
+      max-level: 20
+      points-per-level: 1
+      lore: ["&7Each level: &c+0.5 Damage", "&7Current: &f{level}/{max}"]
+      slot: 11
+    defense:
+      display-name: "&9&lDefense"
+      icon: IRON_CHESTPLATE
+      max-level: 20
+      points-per-level: 1
+      lore: ["&7Each level: &9+0.5 Armor", "&7Current: &f{level}/{max}"]
+      slot: 13
+    health:
+      display-name: "&a&lHealth"
+      icon: APPLE
+      max-level: 20
+      points-per-level: 1
+      lore: ["&7Each level: &a+2 HP", "&7Current: &f{level}/{max}"]
+      slot: 15
+    crit:
+      display-name: "&e&lCrit"
+      icon: GOLD_SWORD
+      max-level: 10
+      points-per-level: 2
+      lore: ["&7Each level: &e+2% Crit", "&7Current: &f{level}/{max}"]
+      slot: 29
+    lifesteal:
+      display-name: "&4&lLifesteal"
+      icon: RED_ROSE
+      max-level: 10
+      points-per-level: 2
+      lore: ["&7Each level: &4+1% Lifesteal", "&7Current: &f{level}/{max}"]
+      slot: 31
+
+# ---------- Tasks ----------
+task:
+  enabled: true
+  required-kills: 15
+  rewards: {gold: 150, talent-points: 5, battlepass-xp: 50}
+  start-message: "&a[Task] &7Kill {count} monsters."
+  progress-message: "&a[Task] &7{kills}/{count}"
+  complete-message: "&6[Task] &eComplete! +{gold} Gold"
+
+# ---------- Crates ----------
+crate:
+  enabled: true
+  trigger-items:
+    common: ["&7Common Crate"]
+    rare: ["&9Rare Crate"]
+    legendary: ["&6Legendary Crate"]
+  rewards:
+    common:
+      - {chance: 0.60, gold: 10, talent-points: 0, battlepass-xp: 5}
+      - {chance: 0.30, gold: 50, talent-points: 0, battlepass-xp: 10}
+      - {chance: 0.10, gold: 100, talent-points: 1, battlepass-xp: 20}
+    rare:
+      - {chance: 0.50, gold: 100, talent-points: 1, battlepass-xp: 20}
+      - {chance: 0.35, gold: 250, talent-points: 2, battlepass-xp: 40}
+      - {chance: 0.15, gold: 500, talent-points: 3, battlepass-xp: 80}
+    legendary:
+      - {chance: 0.40, gold: 500, talent-points: 3, battlepass-xp: 80}
+      - {chance: 0.35, gold: 1000, talent-points: 5, battlepass-xp: 150}
+      - {chance: 0.25, gold: 2500, talent-points: 10, battlepass-xp: 300}
+
+# ---------- Ranks ----------
+rank:
+  enabled: true
+  items:
+    "Warrior Title": warrior
+    "Knight Title": knight
+    "Legend Title": legend
+  ranks:
+    default: {display: "&7&l[Rookie]", chat-prefix: "&7[Rookie] "}
+    warrior: {display: "&c&l[Warrior]", chat-prefix: "&c[Warrior] "}
+    knight: {display: "&f&l[Knight]", chat-prefix: "&f[Knight] "}
+    legend: {display: "&6&l[Legend]", chat-prefix: "&6[Legend] "}
+
+# ---------- BattlePass ----------
+battlepass:
+  enabled: true
+  xp-per-level: 100
+  max-level: 100
+  kill-xp: 5
+  milestone-every: 10
+  milestone-rewards: {talent-points: 5, gold: 500}
+  gold-per-level: 10
+
+# ---------- Economy ----------
+economy:
+  enabled: true
+  starting-gold: 0
+
+# ---------- Daily Reward ----------
+daily:
+  enabled: true
+  rewards:
+    day1: {gold: 100, talent-points: 1}
+    day2: {gold: 200, talent-points: 1}
+    day3: {gold: 300, talent-points: 2}
+    day7: {gold: 1000, talent-points: 5}
+  message: "&e[Daily] &7Day {day}! +{gold} Gold"
+
+# ---------- Shop ----------
+shop:
+  enabled: true
+  menu-title: "&6&lGold Shop &7[Gold: {gold}]"
+  items:
+    talent-point: {price: 100, item: talent-point}
+    crate-common: {price: 50, item: crate-common}
+    crate-rare: {price: 200, item: crate-rare}
+    crate-legendary: {price: 1000, item: crate-legendary}
+    space-ring-basic: {price: 500, item: space-ring-basic}
+    space-ring-advanced: {price: 2000, item: space-ring-advanced}
+    soul-orb: {price: 10000, item: soul-orb}
+    battlepass-token: {price: 80, item: battlepass-token}
+
+# ---------- Storage (Soul Space Levels) ----------
+storage:
+  slots-per-page: 45
+  trigger-items: ["&5Soul Storage Orb", "&dSoul Pearl"]
+  levels:
+    1: {pages: 1, condition: NONE}
+    2: {pages: 3, condition: PERMISSION, value: indierpg.level.2}
+    3: {pages: 6, condition: XP_LEVEL, value: "10"}
+    4: {pages: 10, condition: ITEM, value: DIAMOND:1}
+
+# ---------- Monster Cards ----------
+cards:
+  enabled: true
+  definitions:
+    zombie: {effect: INCREASE_DAMAGE:0}
+    skeleton: {effect: SPEED:0}
+    spider: {effect: JUMP:0}
+  sets:
+    undead: {cards: [zombie, skeleton], effect: DAMAGE_RESISTANCE:0}
+
+# ---------- Bestiary Guide ----------
+guide:
+  enabled: true
+  unlock-on-kill: true
+  entries:
+    zombie:
+      mobs: [zombie]
+      required-kills: 10
+      unlock-chance: 25.0
+      reward: EMERALD:1
+      effect: INCREASE_DAMAGE:0
+    skeleton:
+      mobs: [skeleton]
+      required-kills: 5
+      unlock-chance: 50.0
+      reward: ARROW:16
+      effect: SPEED:0
+
+# ---------- Jewelry Slots ----------
+jewelry:
+  enabled: true
+  pages: 3
+  slots:
+    0: {permission: ""}
+    1: {permission: indierpg.jewelry.2}
+    2: {permission: indierpg.jewelry.3}
+  sets:
+    starter: {jewelry: [lucky-ring, speed-necklace], effect: SPEED:0}
+
+# ---------- Soul Beads (擳?) ----------
+soul-beads:
+  enabled: true
+  page-size: 36
+  definitions:
+    zombie_core:
+      max: 3
+      permission: ""
+      effect: INCREASE_DAMAGE:0
+    skeleton_core:
+      max: 2
+      permission: ""
+      effect: SPEED:0
+    spider_core:
+      max: 2
+      permission: indierpg.bead.spider
+      effect: JUMP:1
+    ender_core:
+      max: 1
+      permission: indierpg.bead.ender
+      effect: SPEED:1
+  sets:
+    undead: {beads: [zombie_core, skeleton_core], effect: DAMAGE_RESISTANCE:0}
+    void: {beads: [ender_core], effect: NIGHT_VISION:0}
+
+# ---------- Item Exchange ----------
+exchange:
+  enabled: true
+  rules:
+    DIAMOND: {cost: 10, reward: EMERALD:1}
+    IRON_INGOT: {cost: 16, reward: GOLD_INGOT:1}
+
+# ---------- Custom Items ----------
+items:
+  space-ring-basic: {material: RING, display-name: "&aBasic Space Ring", lore: ["&7Right-click to open"]}
+  space-ring-advanced: {material: RING, display-name: "&9Advanced Space Ring", lore: ["&7Right-click to open"]}
+  space-ring-supreme: {material: RING, display-name: "&6Supreme Space Ring", lore: ["&7Right-click to open"]}
+  soul-orb: {material: ENDER_PEARL, display-name: "&5Soul Storage Orb", lore: ["&7Right-click to open"]}
+  crate-common: {material: CHEST, display-name: "&7Common Crate", lore: ["&7Right-click to open"]}
+  crate-rare: {material: CHEST, display-name: "&9Rare Crate", lore: ["&7Right-click to open"]}
+  crate-legendary: {material: CHEST, display-name: "&6Legendary Crate", lore: ["&7Right-click to open"]}
+  talent-point: {material: NETHER_STAR, display-name: "&bTalent Point", lore: ["&7Right-click for +1 point"]}
+  battlepass-token: {material: GOLD_RECORD, display-name: "&dBattle Pass Token", lore: ["&7Right-click for +10 XP"]}
+  title-warrior: {material: PAPER, display-name: "&cWarrior Title", lore: ["&7Right-click for title"]}
+  title-knight: {material: PAPER, display-name: "&fKnight Title", lore: ["&7Right-click for title"]}
+  title-legend: {material: PAPER, display-name: "&6Legend Title", lore: ["&7Right-click for title"]}
+
+
+===== D:\test\test\IndieRPG-main\src\main\resources\plugin.yml =====
+
+name: LDAPI
+version: 1.0.0
+main: com.indie.rpg.IndieRPG
+api-version: 1.12
+author: LongDrange
+description: LDAPI 銝剜? RPG ?詨?嚗??Minecraft 1.12.2 Paper ??MythicMobs 4.13.0
+softdepend: [MythicMobs, PlaceholderAPI]
+commands:
+  ldapi:
+    description: LDAPI 銝餅?隞?    aliases: [ld]
+  spacering:
+    description: ??蝛粹???
+    aliases: [sr, ldsr]
+  talent:
+    description: ??憭抵釵
+    aliases: [talents, ldtalent]
+  task:
+    description: ??隞餃?
+    aliases: [ldtask]
+  crate:
+    description: ??撖嗥拳
+    aliases: [ldcrate]
+permissions:
+  ldapi.admin:
+    description: LDAPI 蝞∠??⊥???    default: op
+  ldapi.user:
+    description: LDAPI ?拙振甈?
+    default: true
+
+
+===== D:\test\test\IndieRPG-main\pom.xml =====
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.indie</groupId>
+  <artifactId>LDAPI</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <name>LDAPI</name>
+  <description>LDAPI RPG core for Minecraft 1.12.2 Paper</description>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <repositories>
+    <repository><id>spigotmc-repo</id><url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url></repository>
+    <repository><id>sonatype</id><url>https://oss.sonatype.org/content/groups/public/</url></repository>
+  </repositories>
+  <dependencies>
+    <dependency><groupId>org.spigotmc</groupId><artifactId>spigot-api</artifactId><version>1.12.2-R0.1-SNAPSHOT</version><scope>provided</scope></dependency>
+  </dependencies>
+  <build>
+    <finalName>${project.name}-${project.version}</finalName>
+    <resources><resource><directory>src/main/resources</directory><filtering>true</filtering></resource></resources>
+    <plugins>
+      <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.8.1</version><configuration><source>1.8</source><target>1.8</target><encoding>UTF-8</encoding></configuration></plugin>
+    </plugins>
+  </build>
+</project>
+

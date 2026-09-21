@@ -1,0 +1,12 @@
+target/
+*.jar
+*.class
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+playerdata/
+dungeon-templates/
+*.log
