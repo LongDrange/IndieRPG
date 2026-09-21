@@ -52,6 +52,10 @@ public class CommandHandler implements CommandExecutor {
                 return handleParty(player, args);
             case "guild":
                 return handleGuild(player, args);
+            case "dungeon":
+                return handleDungeon(player, args);
+            case "pet":
+                return handlePet(player, args);
             default:
                 return false;
         }
@@ -83,6 +87,42 @@ public class CommandHandler implements CommandExecutor {
             return true;
         }
         plugin.getJobManager().setJob(player, sub);
+        return true;
+    }
+    
+    private boolean handleDungeon(Player player, String[] args) {
+        if (args.length == 0) {
+            player.sendMessage("§e/dungeon list|enter <id>|leave");
+            return true;
+        }
+        String sub = args[0].toLowerCase();
+        if (sub.equals("list")) {
+            for (String id : plugin.getDungeonManager().getAll().keySet()) {
+                player.sendMessage("§7 - " + id);
+            }
+        } else if (sub.equals("enter") && args.length >= 2) {
+            plugin.getDungeonManager().enter(player, args[1]);
+        } else if (sub.equals("leave")) {
+            plugin.getDungeonManager().leave(player);
+        }
+        return true;
+    }
+
+    private boolean handlePet(Player player, String[] args) {
+        if (args.length == 0) {
+            player.sendMessage("§e/pet summon <id>|dismiss|list");
+            return true;
+        }
+        String sub = args[0].toLowerCase();
+        if (sub.equals("summon") && args.length >= 2) {
+            plugin.getPetManager().summon(player, args[1]);
+        } else if (sub.equals("dismiss")) {
+            plugin.getPetManager().dismiss(player);
+        } else if (sub.equals("list")) {
+            for (String id : plugin.getPetManager().getAll().keySet()) {
+                player.sendMessage("§7 - " + id);
+            }
+        }
         return true;
     }
     private boolean handleParty(Player player, String[] args) {

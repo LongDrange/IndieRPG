@@ -1,0 +1,31 @@
+dungeons:
+  goblin_cave:
+    name: "&a哥布林洞穴"
+    template-world: "dungeon_goblin"
+    min-level: 5
+    max-players: 4
+    time-limit: 1800
+    cooldown: 3600
+    waves:
+      - mobs: ["Goblin", "Goblin", "Goblin", "GoblinArcher"]
+      - mobs: ["Goblin", "GoblinArcher", "GoblinArcher"]
+      - mobs: ["GoblinChief"]
+    rewards:
+      gold: 5000
+      battle-pass-exp: 200
+      item: "growth_core"
+  abyss_temple:
+    name: "&5深淵神殿"
+    template-world: "dungeon_abyss"
+    min-level: 30
+    max-players: 4
+    time-limit: 2400
+    cooldown: 7200
+    waves:
+      - mobs: ["AbyssWraith", "AbyssWraith", "AbyssHound"]
+      - mobs: ["AbyssPriest", "AbyssPriest"]
+      - mobs: ["AbyssLord"]
+    rewards:
+      gold: 20000
+      battle-pass-exp: 500
+      item: "abyss_ring"

@@ -33,6 +33,8 @@ public class IndieRPG extends JavaPlugin {
     private AttributeEngine attributeEngine;
     private PartyManager partyManager;
     private GuildManager guildManager;
+    private DungeonManager dungeonManager;
+    private PetManager petManager;
     private MythicMobsHook mythicMobsHook;
 
     @Override public void onEnable() {
@@ -62,6 +64,8 @@ public class IndieRPG extends JavaPlugin {
         attributeEngine = new AttributeEngine(this);
         partyManager = new PartyManager(this);
         guildManager = new GuildManager(this);
+        dungeonManager = new DungeonManager(this);
+        petManager = new PetManager(this);
         mythicMobsHook = new MythicMobsHook(this);
         mythicMobsHook.enable();
 
@@ -69,8 +73,9 @@ public class IndieRPG extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.CombatListener(this), this);
         getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.PartyListener(this), this);
+        getServer().getPluginManager().registerEvents(new com.indie.rpg.listeners.DungeonListener(this), this);
         CommandHandler handler = new CommandHandler(this);
-        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job", "party", "guild"})
+        for (String command : new String[]{"ldapi", "spacering", "talent", "task", "crate", "job", "party", "guild", "dungeon", "pet"})
             if (getCommand(command) != null) getCommand(command).setExecutor(handler);
         getServer().getScheduler().runTaskTimer(this, new Runnable() {
             @Override public void run() {
@@ -100,6 +105,8 @@ public class IndieRPG extends JavaPlugin {
         if (guideManager != null) guideManager.loadEntries();
         if (soulBeadManager != null) soulBeadManager.loadBeads();
         if (jobManager != null) jobManager.loadJobs();
+        if (dungeonManager != null) dungeonManager.loadDefinitions();
+        if (petManager != null) petManager.loadDefinitions();
     }
     public static IndieRPG getInstance() { return instance; }
     public ConfigManager getConfigManager() { return configManager; }
@@ -126,5 +133,7 @@ public class IndieRPG extends JavaPlugin {
     public AttributeEngine getAttributeEngine() { return attributeEngine; }
     public PartyManager getPartyManager() { return partyManager; }
     public GuildManager getGuildManager() { return guildManager; }
+    public DungeonManager getDungeonManager() { return dungeonManager; }
+    public PetManager getPetManager() { return petManager; }
     public MythicMobsHook getMythicMobsHook() { return mythicMobsHook; }
 }

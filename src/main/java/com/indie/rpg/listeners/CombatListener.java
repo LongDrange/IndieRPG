@@ -63,5 +63,20 @@ public class CombatListener implements Listener {
         if (plugin.getJobManager() != null) {
             plugin.getJobManager().addExp(killer, 5L);
         }
+
+        // 公會經驗
+        if (plugin.getGuildManager() != null) {
+            plugin.getGuildManager().addExp(killer, 2L);
+        }
+
+        // 隊伍共享（30 格內）
+        if (plugin.getPartyManager() != null) {
+            for (Player member : plugin.getPartyManager().getNearbyMembers(killer, 30)) {
+                if (member.equals(killer)) continue;
+                if (plugin.getJobManager() != null) {
+                    plugin.getJobManager().addExp(member, 3L);
+                }
+            }
+        }
     }
 }

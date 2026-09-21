@@ -1,0 +1,22 @@
+pets:
+  baby_wolf:
+    name: "&7小狼"
+    mythic-id: "PetBabyWolf"
+    max-level: 50
+    bonus-per-level:
+      attack: 0.5
+      move-speed: 0.001
+  fire_imp:
+    name: "&c火精靈"
+    mythic-id: "PetFireImp"
+    max-level: 50
+    bonus-per-level:
+      attack: 1.0
+      crit-chance: 0.002
+  spirit_fox:
+    name: "&d靈狐"
+    mythic-id: "PetSpiritFox"
+    max-level: 50
+    bonus-per-level:
+      health: 2.0
+      defense: 0.5
