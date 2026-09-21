@@ -1,60 +1,70 @@
 # MythicMobs 整合教學
 
-LDAPI 會在 MythicMobs 已載入時啟用 API bridge；未安裝時會安全跳過。整合不把 MythicMobs jar 打包進 LDAPI，適用 MythicMobs 4.x 與 Paper 1.12.2。
+LDAPI 會在 MythicMobs 4.x 已載入時啟用 API bridge；未安裝或 API 不相容時會安全停用。MythicMobs jar 不會被打包進 LDAPI。
 
-## 自訂技能
+## 安裝與確認
 
-在 MythicMobs 的技能檔建立技能，例如：
+1. 使用 Paper 1.12.2、Java 8。
+2. 安裝 MythicMobs 4.13.0。
+3. 啟動伺服器，確認控制台出現 `MythicMobs API 整合已啟用`。
+4. 修改 `plugins/LDAPI/config/mythicmobs.yml` 後執行 `/ld reload`。
+
+## 技能觸發
+
+在 MythicMobs 技能檔建立：
 
 ```yaml
+LDAPI_BOSS_SPAWN:
+  Skills:
+  - message{m="&cBoss spawned!"} @PlayersInRadius{r=20}
 LDAPI_BOSS_DEATH:
   Skills:
-  - message{m="&cBoss defeated!"} @PlayersInRadius{r=20}
+  - message{m="&6Boss defeated!"} @PlayersInRadius{r=20}
 ```
 
-在 `plugins/LDAPI/config/mythicmobs.yml` 綁定：
+在 LDAPI 配置綁定：
 
 ```yaml
 mythicmobs:
   events:
     ldapi_boss:
+      spawn:
+        skill: LDAPI_BOSS_SPAWN
       death:
         skill: LDAPI_BOSS_DEATH
 ```
 
-事件收到後，LDAPI 會透過 MythicMobs APIHelper 呼叫技能。
+技能由 MythicMobs APIHelper 以怪物本身作為 caster 施放。
 
-## 怪物掉落綁定 RPG
+## RPG 掉落與獎勵
 
 ```yaml
-mythicmobs:
-  events:
-    ldapi_boss:
-      death:
-        gold: 500
-        battlepass-xp: 50
-        item: growth_core
+death:
+  chance: 0.5
+  gold: 500
+  battlepass-xp: 50
+  item: growth_core
+  command: "say {player} defeated the boss"
 ```
 
-擊殺者可獲得金幣、戰令 XP 與 `items.yml` 中的物品。怪物 ID 必須與 MythicMobs 事件回傳的 mob type 相同。
+- `chance` 使用 0.0–1.0，例如 `0.5` 是 50%。
+- `gold` 寫入 LDAPI 玩家金幣。
+- `battlepass-xp` 增加戰令 XP。
+- `item` 必須是 `items.yml` 中存在的 ID。
+- `command` 由控制台執行，`{player}` 會替換為擊殺者名稱。
 
-## 事件觸發
+## 重要限制
 
-支援的事件配置：
+- `events` 下的 key 必須是 MythicMobs mob 的 internal name，區分大小寫前會轉為小寫比對。
+- 死亡事件沒有玩家擊殺者時，不發放 RPG 獎勵，但仍可執行 death skill。
+- MythicMobs 自己的 drops 與 LDAPI 額外獎勵可以同時存在；避免重複配置相同物品。
+- 修改 MythicMobs 技能後，使用 MythicMobs 自身的 reload 或重啟伺服器。
 
-- `spawn.skill`：怪物生成時呼叫技能
-- `death.skill`：怪物死亡時呼叫技能
-- `death.gold`：擊殺獎勵金幣
-- `death.battlepass-xp`：擊殺獎勵戰令 XP
-- `death.item`：擊殺獎勵物品 ID
+## 測試清單
 
-## 測試流程
-
-1. 安裝 MythicMobs 4.13.0。
-2. 啟動 Paper 1.12.2，確認控制台出現 `MythicMobs API 整合已啟用`。
-3. 建立 MythicMobs 怪物與技能。
-4. 在 `mythicmobs.yml` 加入相同 ID。
-5. 執行 `/ld reload`；修改 MythicMobs 技能後建議重啟或使用其自身 reload。
-6. 召喚怪物並擊殺，確認技能、金幣、物品與戰令 XP。
-
-注意：MythicMobs 不同小版本的事件方法名稱可能不同；若控制台顯示 API 不相容，請使用相容的 4.x 版本並提供啟動日誌以便診斷。
+- [ ] 控制台顯示 API bridge 啟用。
+- [ ] 召喚 `ldapi_boss`，確認 spawn skill。
+- [ ] 玩家擊殺後確認 death skill。
+- [ ] 確認金幣、戰令 XP、`growth_core` 掉落。
+- [ ] 測試 `chance: 0.0` 不發獎勵、`chance: 1.0` 必定發獎勵。
+- [ ] 移除 MythicMobs 後確認 LDAPI 仍能啟動。

@@ -3,28 +3,30 @@ package com.indie.rpg.integrations;
 import com.indie.rpg.IndieRPG;
 import com.indie.rpg.managers.PlayerDataManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventExecutor;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.RegisteredListener;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
+import java.util.Locale;
+import java.util.Random;
 
 /**
- * MythicMobs 4.x bridge。使用官方 Bukkit API 的反射入口，讓 LDAPI 在未安裝
- * MythicMobs 時仍可載入，並避免把第三方 jar 打包進 LDAPI。
+ * Optional MythicMobs 4.x bridge. No MythicMobs classes are referenced directly,
+ * so LDAPI can still load when MythicMobs is absent.
  */
 public class MythicMobsHook implements Listener {
     private final IndieRPG plugin;
-    private Object mythicApi;
+    private final Random random = new Random();
+    private Object apiHelper;
     private boolean enabled;
 
     public MythicMobsHook(IndieRPG plugin) {
@@ -32,104 +34,140 @@ public class MythicMobsHook implements Listener {
     }
 
     public void enable() {
+        if (!plugin.getConfigManager().get("mythicmobs").getBoolean("mythicmobs.enabled", true)) {
+            plugin.getLogger().info("MythicMobs 整合已在配置中停用。");
+            return;
+        }
         Plugin mythic = Bukkit.getPluginManager().getPlugin("MythicMobs");
         if (mythic == null || !mythic.isEnabled()) {
-            plugin.getLogger().info("MythicMobs 未安裝，跳過 MythicMobs API 整合。");
+            plugin.getLogger().info("MythicMobs 未安裝，跳過 API 整合。");
             return;
         }
         try {
-            Class<?> mythicBukkit = Class.forName("io.lumine.xikage.mythicmobs.bukkit.MythicBukkit");
-            Object instance = mythicBukkit.getMethod("inst").invoke(null);
-            mythicApi = instance.getClass().getMethod("getAPIHelper").invoke(instance);
-            enabled = true;
-            registerMythicEvent("io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent", "death");
-            registerMythicEvent("io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent", "spawn");
+            Class<?> bridge = Class.forName("io.lumine.xikage.mythicmobs.bukkit.MythicBukkit");
+            Object instance = bridge.getMethod("inst").invoke(null);
+            apiHelper = instance.getClass().getMethod("getAPIHelper").invoke(instance);
+            enabled = apiHelper != null;
+            registerEvent("io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobSpawnEvent", "spawn");
+            registerEvent("io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent", "death");
             plugin.getLogger().info("MythicMobs API 整合已啟用。");
         } catch (Exception ex) {
-            plugin.getLogger().warning("MythicMobs API 版本不相容，已停用整合：" + ex.getClass().getSimpleName());
+            enabled = false;
+            plugin.getLogger().warning("MythicMobs API 初始化失敗：" + ex.getClass().getSimpleName());
         }
     }
 
-    public boolean isEnabled() { return enabled; }
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-    /** 以 MythicMobs APIHelper 施放 skill，skill 名稱來自 mythicmobs.yml。 */
+    /** 呼叫 MythicMobs APIHelper.castSkill，支援不同 4.x 方法參數順序。 */
     public boolean castSkill(LivingEntity caster, String skill) {
-        if (!enabled || mythicApi == null || skill == null || skill.trim().isEmpty()) return false;
+        if (!enabled || caster == null || skill == null || skill.trim().isEmpty()) return false;
         try {
-            Method cast = findMethod(mythicApi.getClass(), "castSkill", 2);
-            if (cast == null) return false;
-            Object result = cast.invoke(mythicApi, caster, skill);
-            return !(result instanceof Boolean) || (Boolean) result;
+            for (Method method : apiHelper.getClass().getMethods()) {
+                if (!"castSkill".equals(method.getName()) || method.getParameterTypes().length != 2) continue;
+                Class<?>[] types = method.getParameterTypes();
+                Object[] args;
+                if (types[0].isAssignableFrom(String.class) && types[1].isAssignableFrom(caster.getClass())) {
+                    args = new Object[]{skill, caster};
+                } else if (types[0].isAssignableFrom(caster.getClass()) && types[1].isAssignableFrom(String.class)) {
+                    args = new Object[]{caster, skill};
+                } else {
+                    continue;
+                }
+                Object result = method.invoke(apiHelper, args);
+                return !(result instanceof Boolean) || (Boolean) result;
+            }
         } catch (Exception ex) {
-            plugin.getLogger().warning("施放 MythicMobs skill 失敗：" + skill);
-            return false;
+            plugin.getLogger().warning("施放 MythicMobs 技能失敗：" + skill);
         }
+        return false;
     }
 
-    private void registerMythicEvent(String className, final String type) {
+    private void registerEvent(String className, final String type) {
         try {
             final Class<?> eventClass = Class.forName(className);
             EventExecutor executor = new EventExecutor() {
-                @Override public void execute(Listener listener, Event event) {
-                    handleEvent(event, type);
+                @Override public void execute(Listener ignored, Event event) {
+                    handleMythicEvent(event, type);
                 }
             };
-            Bukkit.getPluginManager().registerEvent((Class<? extends Event>) eventClass,
-                    this, org.bukkit.event.EventPriority.NORMAL, executor, plugin);
-        } catch (ClassNotFoundException ignored) {
+            Bukkit.getPluginManager().registerEvent((Class<? extends Event>) eventClass, this,
+                    EventPriority.NORMAL, executor, plugin);
+        } catch (ClassNotFoundException ex) {
             plugin.getLogger().warning("找不到 MythicMobs 事件類別：" + className);
         }
     }
 
-    private void handleEvent(Event event, String type) {
-        String mobId = invokeString(event, "getMobType", "getMobName", "getMobId");
-        if (mobId == null) mobId = "unknown";
-        Map<?, ?> rules = plugin.getConfigManager().get("mythicmobs").getConfigurationSection("mythicmobs.events") == null
-                ? null : plugin.getConfigManager().get("mythicmobs").getConfigurationSection("mythicmobs.events").getValues(false);
-        if (rules == null) return;
-        Object raw = rules.get(mobId.toLowerCase());
-        if (!(raw instanceof org.bukkit.configuration.ConfigurationSection)) return;
-        org.bukkit.configuration.ConfigurationSection rule = (org.bukkit.configuration.ConfigurationSection) raw;
+    private void handleMythicEvent(Event event, String type) {
+        String mobId = readMobId(event);
+        if (mobId == null) return;
+        ConfigurationSection root = plugin.getConfigManager().get("mythicmobs")
+                .getConfigurationSection("mythicmobs.events");
+        if (root == null) return;
+        ConfigurationSection rule = root.getConfigurationSection(mobId.toLowerCase(Locale.ENGLISH));
+        if (rule == null) return;
+
+        LivingEntity mob = readLivingEntity(event);
+        Player killer = readKiller(event, mob);
         String skill = rule.getString(type + ".skill");
-        Player player = findPlayer(event);
-        if (skill != null && player != null) castSkill(player, skill);
-        if ("death".equals(type) && player != null) {
-            PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
-            data.gold += rule.getInt("death.gold", 0);
-            int xp = rule.getInt("death.battlepass-xp", 0);
-            if (xp > 0) plugin.getBattlePassManager().addXP(player, xp);
-            String item = rule.getString("death.item");
-            if (item != null) {
-                org.bukkit.inventory.ItemStack stack = plugin.getItemManager().getItem(item);
-                if (stack != null) player.getInventory().addItem(stack);
-            }
+        if (skill != null && mob != null) castSkill(mob, skill);
+
+        if ("death".equals(type) && killer != null) {
+            giveDeathRewards(killer, rule.getConfigurationSection("death"));
         }
     }
 
-    private Player findPlayer(Event event) {
-        if (event instanceof EntityDeathEvent) {
-            Player p = ((EntityDeathEvent) event).getEntity().getKiller();
-            if (p != null) return p;
+    private void giveDeathRewards(Player player, ConfigurationSection reward) {
+        if (reward == null) return;
+        double chance = reward.getDouble("chance", 1.0D);
+        if (chance < 1.0D && random.nextDouble() > chance) return;
+
+        PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
+        data.gold += Math.max(0, reward.getInt("gold", 0));
+        int xp = reward.getInt("battlepass-xp", 0);
+        if (xp > 0) plugin.getBattlePassManager().addXP(player, xp);
+
+        String itemId = reward.getString("item");
+        if (itemId != null && !itemId.trim().isEmpty()) {
+            ItemStack item = plugin.getItemManager().getItem(itemId);
+            if (item != null) player.getInventory().addItem(item);
         }
-        Object entity = invoke(event, "getEntity", "getMob");
-        if (entity instanceof Entity && ((Entity) entity).getLastDamageCause() instanceof EntityDeathEvent) {
-            return ((EntityDeathEvent) ((Entity) entity).getLastDamageCause()).getEntity().getKiller();
+        String command = reward.getString("command");
+        if (command != null && !command.trim().isEmpty()) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player}", player.getName()));
         }
-        return null;
     }
 
-    private String invokeString(Object target, String... names) {
-        Object value = invoke(target, names);
-        return value == null ? null : String.valueOf(value);
+    private String readMobId(Object event) {
+        Object mob = invoke(event, "getMob", "getMythicMob");
+        Object type = mob == null ? null : invoke(mob, "getType");
+        Object value = type == null ? null : invoke(type, "getInternalName", "getName");
+        if (value == null) value = invoke(event, "getMobType", "getMobName", "getMobId");
+        return value == null ? null : String.valueOf(value).toLowerCase(Locale.ENGLISH);
+    }
+
+    private LivingEntity readLivingEntity(Object event) {
+        Object value = invoke(event, "getEntity", "getBukkitEntity");
+        return value instanceof LivingEntity ? (LivingEntity) value : null;
+    }
+
+    private Player readKiller(Object event, LivingEntity mob) {
+        Object killer = invoke(event, "getKiller", "getPlayer");
+        if (killer instanceof Player) return (Player) killer;
+        if (mob != null && mob.getLastDamageCause() instanceof EntityDeathEvent) {
+            return ((EntityDeathEvent) mob.getLastDamageCause()).getEntity().getKiller();
+        }
+        return mob == null ? null : mob.getKiller();
     }
 
     private Object invoke(Object target, String... names) {
-        for (String name : names) try { return target.getClass().getMethod(name).invoke(target); } catch (Exception ignored) { }
-        return null;
-    }
-
-    private Method findMethod(Class<?> type, String name, int count) {
-        for (Method method : type.getMethods()) if (method.getName().equals(name) && method.getParameterTypes().length == count) return method;
+        if (target == null) return null;
+        for (String name : names) {
+            try { return target.getClass().getMethod(name).invoke(target); }
+            catch (Exception ignored) { }
+        }
         return null;
     }
 }

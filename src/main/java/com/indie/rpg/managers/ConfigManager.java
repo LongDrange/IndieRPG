@@ -10,9 +10,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * 集中管理 config/ 下的獨立 YAML 配置，新增 shop、dailyreward 對應配置
- */
+/** 集中管理 plugins/LDAPI/config 下的 YAML。 */
 public class ConfigManager {
     private final IndieRPG plugin;
     private final File directory;
@@ -27,19 +25,14 @@ public class ConfigManager {
 
     public void reloadAll() {
         files.clear();
-        String[] names = {"general", "items", "attributes", "jewelry", "spaces", "commands", "tests", "shop", "dailyreward"};
+        String[] names = {"general", "items", "attributes", "jewelry", "spaces", "commands", "tests", "shop", "dailyreward", "mythicmobs"};
         for (String name : names) {
             File file = new File(directory, name + ".yml");
             if (!file.exists()) {
-                try {
-                    plugin.saveResource("config/" + name + ".yml", false);
-                } catch (IllegalArgumentException ignored) {
-                    plugin.getLogger().warning("找不到內置配置：config/" + name + ".yml");
-                }
+                try { plugin.saveResource("config/" + name + ".yml", false); }
+                catch (IllegalArgumentException ignored) { plugin.getLogger().warning("找不到內置配置：config/" + name + ".yml"); }
             }
-            if (file.exists()) {
-                files.put(name, YamlConfiguration.loadConfiguration(file));
-            }
+            if (file.exists()) files.put(name, YamlConfiguration.loadConfiguration(file));
         }
     }
 
@@ -48,9 +41,7 @@ public class ConfigManager {
         return config == null ? new YamlConfiguration() : config;
     }
 
-    public Map<String, FileConfiguration> getAll() {
-        return Collections.unmodifiableMap(files);
-    }
+    public Map<String, FileConfiguration> getAll() { return Collections.unmodifiableMap(files); }
 
     public void save(String name) throws IOException {
         FileConfiguration config = files.get(name);

@@ -6,17 +6,16 @@ mythicmobs:
       spawn:
         skill: LDAPI_BOSS_SPAWN
       death:
+        chance: 1.0
+        skill: LDAPI_BOSS_DEATH
         gold: 500
         battlepass-xp: 50
         item: growth_core
-        skill: LDAPI_BOSS_DEATH
+        command: ""
     mythic_zombie:
       death:
+        chance: 0.25
         gold: 25
         battlepass-xp: 10
-  drops:
-    ldapi_boss:
-      item: growth_core
-      chance: 0.25
-      gold: 100
-      battlepass-xp: 20
+        item: growth_core
+  # mob ID 必須與 MythicMobs 的 internal name 一致；獎勵只在擊殺者存在時發放。
