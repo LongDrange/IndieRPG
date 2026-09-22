@@ -64,6 +64,7 @@ public class CommandHandler implements CommandExecutor {
                 return false;
         }
     }
+
     private boolean handleJob(Player player, String[] args) {
         if (args.length < 1) {
             PlayerDataManager.PlayerData data = plugin.getPlayerDataManager().getPlayerData(player);
@@ -90,7 +91,7 @@ public class CommandHandler implements CommandExecutor {
         plugin.getJobManager().setJob(player, sub);
         return true;
     }
-    
+
     private boolean handleRep(Player player, String[] args) {
         for (Map.Entry<String, com.indie.rpg.managers.ReputationManager.Faction> e
                 : plugin.getReputationManager().getAll().entrySet()) {
@@ -109,9 +110,10 @@ public class CommandHandler implements CommandExecutor {
         }
         return true;
     }
+
     private boolean handleDungeon(Player player, String[] args) {
         if (args.length == 0) {
-            player.sendMessage("§e/dungeon list|enter <id>|leave");
+            player.sendMessage("§e/dungeon list|enter <id>|leave|top <id>");
             return true;
         }
         String sub = args[0].toLowerCase();
@@ -123,6 +125,20 @@ public class CommandHandler implements CommandExecutor {
             plugin.getDungeonManager().enter(player, args[1]);
         } else if (sub.equals("leave")) {
             plugin.getDungeonManager().leave(player);
+        } else if (sub.equals("top") && args.length >= 2) {
+            java.util.List<com.indie.rpg.managers.DungeonLeaderboardManager.Record> top =
+                    plugin.getDungeonLeaderboard().getTop(args[1], 10);
+            player.sendMessage("§6=== " + args[1] + " 排行榜 ===");
+            if (top.isEmpty()) {
+                player.sendMessage("§7尚無記錄");
+            } else {
+                int i = 1;
+                for (com.indie.rpg.managers.DungeonLeaderboardManager.Record r : top) {
+                    player.sendMessage("§e#" + i + " §f" + r.player
+                            + " §7- §a" + (r.millis / 1000) + " 秒 §7(" + r.partySize + " 人)");
+                    i++;
+                }
+            }
         }
         return true;
     }
@@ -144,6 +160,7 @@ public class CommandHandler implements CommandExecutor {
         }
         return true;
     }
+
     private boolean handleParty(Player player, String[] args) {
         if (args.length == 0) {
             player.sendMessage("§e/party create|invite <player>|accept|leave");

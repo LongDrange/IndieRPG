@@ -43,7 +43,7 @@ public class MythicMobsHook implements Listener {
             return;
         }
         try {
-            Class<?> bridge = Class.forName("io.lumine.xikage.mythicmobs.bukkit.MythicBukkit");
+            Class<?> bridge = Class.forName("io.lumine.xikage.mythicmobs.MythicMobs");
             Object instance = bridge.getMethod("inst").invoke(null);
             apiHelper = instance.getClass().getMethod("getAPIHelper").invoke(instance);
             enabled = apiHelper != null;

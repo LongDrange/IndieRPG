@@ -175,6 +175,30 @@ shop:
     soul-orb: {price: 10000, item: soul-orb}
     battlepass-token: {price: 80, item: battlepass-token}
 
+# ---------- 副本指令限制 ----------
+dungeon:
+  commands:
+    enabled: true
+    allowed:
+      - "dungeon"
+      - "dg"
+      - "party"
+      - "pt"
+      - "msg"
+      - "tell"
+      - "w"
+      - "r"
+      - "reply"
+      - "help"
+      - "?"
+      - "ld"
+      - "ldapi"
+      - "job"
+      - "talent"
+      - "rep"
+      - "npc"
+      - "spawn"
+    blocked-message: "&c副本內無法使用該指令，請先 /dungeon leave 離開副本。"
 # ---------- Storage (Soul Space Levels) ----------
 storage:
   slots-per-page: 45
@@ -183,17 +207,17 @@ storage:
     1: {pages: 1, condition: NONE}
     2: {pages: 3, condition: PERMISSION, value: indierpg.level.2}
     3: {pages: 6, condition: XP_LEVEL, value: "10"}
-    4: {pages: 10, condition: ITEM, value: DIAMOND:1}
+    4: {pages: 10, condition: ITEM, value: "DIAMOND:1"}
 
 # ---------- Monster Cards ----------
 cards:
   enabled: true
   definitions:
-    zombie: {effect: INCREASE_DAMAGE:0}
-    skeleton: {effect: SPEED:0}
-    spider: {effect: JUMP:0}
+    zombie: {effect: "INCREASE_DAMAGE:0"}
+    skeleton: {effect: "SPEED:0"}
+    spider: {effect: "JUMP:0"}
   sets:
-    undead: {cards: [zombie, skeleton], effect: DAMAGE_RESISTANCE:0}
+    undead: {cards: [zombie, skeleton], effect: "DAMAGE_RESISTANCE:0"}
 
 # ---------- Bestiary Guide ----------
 guide:
@@ -204,14 +228,14 @@ guide:
       mobs: [zombie]
       required-kills: 10
       unlock-chance: 25.0
-      reward: EMERALD:1
-      effect: INCREASE_DAMAGE:0
+      reward: "EMERALD:1"
+      effect: "INCREASE_DAMAGE:0"
     skeleton:
       mobs: [skeleton]
       required-kills: 5
       unlock-chance: 50.0
-      reward: ARROW:16
-      effect: SPEED:0
+      reward: "ARROW:16"
+      effect: "SPEED:0"
 
 # ---------- Jewelry Slots ----------
 jewelry:
@@ -222,7 +246,7 @@ jewelry:
     1: {permission: indierpg.jewelry.2}
     2: {permission: indierpg.jewelry.3}
   sets:
-    starter: {jewelry: [lucky-ring, speed-necklace], effect: SPEED:0}
+    starter: {jewelry: [lucky-ring, speed-necklace], effect: "SPEED:0"}
 
 # ---------- Soul Beads (魂珠) ----------
 soul-beads:
@@ -232,29 +256,29 @@ soul-beads:
     zombie_core:
       max: 3
       permission: ""
-      effect: INCREASE_DAMAGE:0
+      effect: "INCREASE_DAMAGE:0"
     skeleton_core:
       max: 2
       permission: ""
-      effect: SPEED:0
+      effect: "SPEED:0"
     spider_core:
       max: 2
       permission: indierpg.bead.spider
-      effect: JUMP:1
+      effect: "JUMP:1"
     ender_core:
       max: 1
       permission: indierpg.bead.ender
-      effect: SPEED:1
+      effect: "SPEED:1"
   sets:
-    undead: {beads: [zombie_core, skeleton_core], effect: DAMAGE_RESISTANCE:0}
-    void: {beads: [ender_core], effect: NIGHT_VISION:0}
+    undead: {beads: [zombie_core, skeleton_core], effect: "DAMAGE_RESISTANCE:0"}
+    void: {beads: [ender_core], effect: "NIGHT_VISION:0"}
 
 # ---------- Item Exchange ----------
 exchange:
   enabled: true
   rules:
-    DIAMOND: {cost: 10, reward: EMERALD:1}
-    IRON_INGOT: {cost: 16, reward: GOLD_INGOT:1}
+    DIAMOND: {cost: 10, reward: "EMERALD:1"}
+    IRON_INGOT: {cost: 16, reward: "GOLD_INGOT:1"}
 
 # ---------- Custom Items ----------
 items:

@@ -34,6 +34,7 @@ public class IndieRPG extends JavaPlugin {
     private PartyManager partyManager;
     private GuildManager guildManager;
     private DungeonManager dungeonManager;
+    private DungeonLeaderboardManager dungeonLeaderboard;
     private PetManager petManager;
     private ReputationManager reputationManager;
     private NpcDialogueManager npcDialogueManager;
@@ -77,6 +78,7 @@ public class IndieRPG extends JavaPlugin {
         partyManager = new PartyManager(this);
         guildManager = new GuildManager(this);
         dungeonManager = new DungeonManager(this);
+        dungeonLeaderboard = new DungeonLeaderboardManager(this);
         petManager = new PetManager(this);
         reputationManager = new ReputationManager(this);
         npcDialogueManager = new NpcDialogueManager(this);
@@ -154,6 +156,7 @@ public class IndieRPG extends JavaPlugin {
     public PartyManager getPartyManager() { return partyManager; }
     public GuildManager getGuildManager() { return guildManager; }
     public DungeonManager getDungeonManager() { return dungeonManager; }
+    public DungeonLeaderboardManager getDungeonLeaderboard() { return dungeonLeaderboard; }
     public PetManager getPetManager() { return petManager; }
     public ReputationManager getReputationManager() { return reputationManager; }
     public NpcDialogueManager getNpcDialogueManager() { return npcDialogueManager; }
